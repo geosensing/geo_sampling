@@ -1,6 +1,8 @@
 Geo sampling
 ============
 
+.. image:: https://ci.appveyor.com/api/projects/status/gtm9ao3u7ir4gs0w?svg=true
+    :target: https://ci.appveyor.com/project/soodoku/geo_sampling
 .. image:: https://travis-ci.org/soodoku/geo_sampling.svg?branch=master
     :target: https://travis-ci.org/soodoku/geo_sampling
 .. image:: https://img.shields.io/pypi/v/geo_sampling.svg?maxAge=2592000
