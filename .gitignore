@@ -1,0 +1,8 @@
+.*
+!.gitignore
+!.gitattributes
+!.travis.yml
+*.pyc
+*.log
+output.csv
+data
