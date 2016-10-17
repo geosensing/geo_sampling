@@ -1,8 +1,8 @@
 Geo sampling
 ============
 
-.. image:: https://travis-ci.org/suriyan/geo_sampling.svg?branch=master
-    :target: https://travis-ci.org/suriyan/geo_sampling
+.. image:: https://travis-ci.org/soodoku/geo_sampling.svg?branch=master
+    :target: https://travis-ci.org/soodoku/geo_sampling
 .. image:: https://img.shields.io/pypi/v/geo_sampling.svg?maxAge=2592000
     :target: https://pypi.python.org/pypi/geo_sampling
 
