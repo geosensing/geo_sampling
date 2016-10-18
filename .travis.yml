@@ -3,9 +3,7 @@ language: python
 python:
 - '2.7'
 env:
-  - COUNTRY_NAME='Singapore'
-  - REGION_NAME='North'
-  - ADM_LEVEL='1'
+  - COUNTRY_NAME='Singapore' REGION_NAME='North' ADM_LEVEL='1'
 # command to install dependencies
 install:
   - "pip install ."
