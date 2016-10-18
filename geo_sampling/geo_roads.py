@@ -24,6 +24,7 @@ GADM_SHP_URL_FMT = 'http://biogeo.ucdavis.edu/data/gadm2.8/shp/{0}_adm_shp.zip'
 
 # To workaround request entity too large in URL request
 BBBIKE_MAX_POINTS = 300
+BBBIKE_MAX_WAIT = 50
 
 
 def check_length(l):
@@ -220,22 +221,26 @@ def bbbike_submit_extract_link(args):
 
 
 def bbbike_check_download_link(args):
-    while True:
+    wait = 0
+    while wait < BBBIKE_MAX_WAIT:
         try:
-            r = requests.get('http://download.bbbike.org/osm/extract/')
+            r = requests.get('http://download.bbbike.org/osm/extract/?date=all')
             if r.status_code == 200:
                 soup = BeautifulSoup(r.text, 'html.parser')
                 city_span = soup.find('span', {'title': args.city})
-                dl = city_span.parent.find_next_siblings()[2]
-                link = dl.find('a')
-                if link:
-                    href = link['href']
-                    return 'http://download.bbbike.org/' + href
+                if city_span:
+                    dl = city_span.parent.find_next_siblings()[2]
+                    link = dl.find('a')
+                    if link:
+                        href = link['href']
+                        return 'http://download.bbbike.org/' + href
             print("Waiting for download link ready (15s)...")
             time.sleep(15)
         except KeyboardInterrupt as e:
             print(e)
             break
+        wait += 1
+    print("Cannot get download link from BBBike.org")
     return ''
 
 
