@@ -21,8 +21,8 @@ deploy:
     on:
       tags: false
       distributions: sdist bdist_wheel
-      repo: suriyan/geo_sampling
-      branch: master
+      repo: soodoku/geo_sampling
+      branch: public
       condition: $TRAVIS_PYTHON_VERSION = "2.7"
   # production pypi
   - provider: pypi
@@ -32,8 +32,8 @@ deploy:
     on:
       tags: true
       distributions: sdist bdist_wheel
-      repo: suriyan/geo_sampling
-      branch: master
+      repo: soodoku/geo_sampling
+      branch: public
       condition: $TRAVIS_PYTHON_VERSION = "2.7"
 after_deploy:
   - "echo 'after'"
