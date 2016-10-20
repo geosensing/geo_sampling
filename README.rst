@@ -53,11 +53,11 @@ Upgrade Python packages `pip` and `setuptools` to the latest version.
     pip install --upgrade pip setuptools
 
 
-Install geo-sampling package from test PyPI.
+Install geo-sampling package from PyPI.
 
 ::
 
-    pip install --extra-index-url https://testpypi.python.org/pypi geo-sampling
+    pip install geo-sampling
 
 
 Documentation
