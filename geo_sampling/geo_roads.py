@@ -192,7 +192,7 @@ def bbbike_generate_extract_link(args):
             new_len = line.length / BBBIKE_MAX_POINTS
             new_line = redistribute_vertices(line, new_len)
             for lat, lng in new_line.coords:
-                points.append('%.3f,%.3f' % (lat, lng))
+                points.append('{0:.3f},{1:.3f}'.format(lat, lng))
             coords = '|'.join(points)
             sw_lng, sw_lat, ne_lng, ne_lat = s.shape.bbox
             city = args.ccode + '_' + args.name
@@ -353,12 +353,12 @@ def main(argv=sys.argv[1:]):
 
     lng, lat = sr[0].shape.points[0]
     a, b, zone_x, zone_y = utm.from_latlon(lat, lng)
-    utm_zone = "%d%s" % (zone_x, zone_y)
+    utm_zone = "{0:d}{1!s}".format(zone_x, zone_y)
 
     wgs2utm = partial(pyproj.transform, pyproj.Proj("+init=EPSG:4326"),
-                      pyproj.Proj("+proj=utm +zone=%s" % utm_zone))
-    utm2wgs = partial(pyproj.transform, pyproj.Proj("+proj=utm +zone=%s" %
-                      utm_zone), pyproj.Proj("+init=EPSG:4326"))
+                      pyproj.Proj("+proj=utm +zone={0!s}".format(utm_zone)))
+    utm2wgs = partial(pyproj.transform, pyproj.Proj("+proj=utm +zone={0!s}".format(
+                      utm_zone)), pyproj.Proj("+init=EPSG:4326"))
 
     uid = 0
     road_types = args.types
