@@ -69,6 +69,10 @@ Documentation
 
 For more information please visit the `project documentation page <http://geo-sampling.readthedocs.io/en/latest/>`_.
 
+Downloads
+==========
+As of February 4th, 2018, the package had been downloaded over 3,000 times (see the `saved BigQuery <https://bigquery.cloud.google.com/savedquery/267723140544:d95533161e5248229a0024535b625b0e>`__).
+
 Authors
 =======
 
