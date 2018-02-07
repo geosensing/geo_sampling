@@ -1,0 +1,20 @@
+package:
+  name: geo-sampling
+  version: "0.0.7"
+
+source:
+  fn: geo-sampling-0.0.7.tar.gz
+  md5: d9932d476f29ac5b3801a43d8f3f67b4
+  url: https://pypi.python.org/packages/ee/6d/d67105b13481503b178fed46735997bb1375f02ef5f8f95d85533371700f/geo-sampling-0.0.7.tar.gz
+
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    - python
+
+about:
+  home: https://github.com/geosensing/geo_sampling
+  license: MIT
+  license_file: LICENSE
