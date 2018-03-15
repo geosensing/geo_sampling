@@ -8,7 +8,7 @@ import random
 
 
 def main(argv=sys.argv[1:]):
-    parser = argparse.ArgumentParser(description='Random sample road segments')
+    parser = argparse.ArgumentParser(description='Randomly sample road segments')
     parser.add_argument('input', default=None,
                         help='Road segments input file')
     parser.add_argument('-n', '--n-samples', dest='samples', type=int,
