@@ -17,9 +17,9 @@ Workflow
 
   .. image:: _images/india-delhi-roads-plot-all.png
 
-  There are many types of roads found in the map data: 'primary', 'pedestrian', 'bridleway', 'secondary_link', 'tertiary', 'primary_link', 'service', 'residential', 'motorway_link', 'cycleway', 'secondary', 'living_street', 'track', 'motorway', 'construction', 'tertiary_link', 'trunk', 'path', 'trunk_link', 'rest_area', 'footway', 'unclassified', 'steps', and 'road'
+  There are many types of roads: 'primary', 'pedestrian', 'bridleway', 'secondary_link', 'tertiary', 'primary_link', 'service', 'residential', 'motorway_link', 'cycleway', 'secondary', 'living_street', 'track', 'motorway', 'construction', 'tertiary_link', 'trunk', 'path', 'trunk_link', 'rest_area', 'footway', 'unclassified', 'steps', and 'road'
 
-4) Filter a few interesting road types and plot with matplotlib:
+4) Filter relevant road types and plot with matplotlib:
 
 .. image:: _images/india-delhi-roads-plot-selected-zoom-wgs84.png
 
@@ -28,4 +28,3 @@ Workflow
 .. image:: _images/india-delhi-roads-plot-selected-segmented-zoom-wgs84.png
 
 6) Write out all the segments to a CSV file.
-

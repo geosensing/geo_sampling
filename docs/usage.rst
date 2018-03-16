@@ -27,7 +27,7 @@ Get all the roads in a specific region from OpenStreetMap.
 	                        Output file name
 	  -d DISTANCE, --distance DISTANCE
 	                        Distance in meters to split
-	  --no-header           Output without header at the first row
+	  --no-header           Output without header
 	  --plot                Plot the output
 
   
@@ -63,19 +63,19 @@ To get a list of all boundary names of Thailand at a specific administrative lev
 
 In this case, all boundary names (77 provinces) at the 1st `administrative divisions level <https://en.wikipedia.org/wiki/Table_of_administrative_divisions_by_country>`_ of Thailand will be listed.
 
-To get road data for the ``Trang`` province (only the road types `trunk`, `primary`, `secondary` and `tertiary`):
+To get road data for the ``Trang`` province (only `trunk`, `primary`, `secondary` and `tertiary` road types):
 
 ::
 
     geo_roads -c Thailand -l 1 -n Trang -t trunk primary secondary tertiary --plot
 
 
-Default output file will be saved as ``output.csv`` and all the road segments will be plotted if *--plot* is specified
+By default, the output will be saved in ``output.csv`` and all the road segments will be plotted if *--plot* is specified
 
 .. image:: _images/tha_trang.png
 
 
-To run the script for ``Delhi of India`` and to save the output as ``delhi-roads.csv``: 
+To run the script for ``Delhi, India`` and to save the output as ``delhi-roads.csv``: 
 
 ::
 
@@ -91,7 +91,7 @@ By default, all road types will be outputted if `--types, -t` is not specified.
 sample_roads
 ------------
 
-Randomly sample a specific number of road segments of all roads or specific road types.
+Get a random sample of road segments, of all roads or specific road types.
 
 ::
 
@@ -112,7 +112,7 @@ Randomly sample a specific number of road segments of all roads or specific road
 	                        Select road types (list)
 	  -o OUTPUT, --output OUTPUT
 	                        Sample output file name
-	  --no-header           Output without header at the first row
+	  --no-header           Output without header
 	  --plot                Plot the output
 
 Examples
@@ -128,7 +128,7 @@ To get a random sample of 1,0000 road segments of road types `primary`, `seconda
 .. image:: _images/delhi_sampling1000.png
 
 
-To get specific road types for Rhode Island in US:
+To get specific road types for Rhode Island in the US:
 
 ::
 
