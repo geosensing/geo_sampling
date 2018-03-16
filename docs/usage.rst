@@ -27,7 +27,7 @@ Get all the roads in a specific region from OpenStreetMap.
 	                        Output file name
 	  -d DISTANCE, --distance DISTANCE
 	                        Distance in meters to split
-	  --no-header           Output without header
+	  --no-header           Output without the header
 	  --plot                Plot the output
 
   
@@ -112,7 +112,7 @@ Get a random sample of road segments, of all roads or specific road types.
 	                        Select road types (list)
 	  -o OUTPUT, --output OUTPUT
 	                        Sample output file name
-	  --no-header           Output without header
+	  --no-header           Output without the header
 	  --plot                Plot the output
 
 Examples

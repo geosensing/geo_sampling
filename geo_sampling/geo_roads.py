@@ -262,7 +262,7 @@ def main(argv=sys.argv[1:]):
                         default=500,
                         help='Distance in meters to split')
     parser.add_argument('--no-header', dest='noheader', action='store_true',
-                        help='Output without header at the first row')
+                        help='Output without the header')
     parser.set_defaults(noheader=False)
     parser.add_argument('--plot', dest='plot', action='store_true',
                         help='Plot the output')
@@ -349,7 +349,7 @@ def main(argv=sys.argv[1:]):
         else:
             selected = t in args.types
         print('{0} {1}'.format('*' if selected else '-', t))
-    print("You can specify the road types with -t option. (* is selected)")
+    print("You can specify the road types with -t. (* is selected)")
 
     lng, lat = sr[0].shape.points[0]
     a, b, zone_x, zone_y = utm.from_latlon(lat, lng)

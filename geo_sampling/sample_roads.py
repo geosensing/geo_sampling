@@ -18,7 +18,7 @@ def main(argv=sys.argv[1:]):
     parser.add_argument('-o', '--output', default='sample-output.csv',
                         help='Sample output file name')
     parser.add_argument('--no-header', dest='noheader', action='store_true',
-                        help='Output without header at the first row')
+                        help='Output without the header')
     parser.set_defaults(noheader=False)
     parser.add_argument('--plot', dest='plot', action='store_true',
                         help='Plot the output')
