@@ -60,11 +60,11 @@ def output_to_file(writer, uid, osm_id, osm_name, osm_type, l):
 
 
 def gadm_get_country_list():
-    r = requests.get('http://gadm.org/country')
+    r = requests.get('http://gadm.org/download_country_v2.html')
     countries = {}
     if r.status_code == 200:
         soup = BeautifulSoup(r.text, 'html.parser')
-        for opt in soup.find('select', {'name': 'cnt'}).find_all('option'):
+        for opt in soup.find('select', {'name': 'country'}).find_all('option'):
             countries[opt.text.strip()] = opt['value']
     return countries
 
