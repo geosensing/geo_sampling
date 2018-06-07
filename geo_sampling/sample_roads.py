@@ -23,10 +23,15 @@ def main(argv=sys.argv[1:]):
     parser.add_argument('--plot', dest='plot', action='store_true',
                         help='Plot the output')
     parser.set_defaults(plot=False)
+    parser.add_argument('-s', '--seed', dest='seed', type=int,
+                        default=0, help='Random seed')
 
     args = parser.parse_args(argv)
 
     print(args)
+
+    if args.seed != 0:
+        random.seed(args.seed)
 
     road_types = args.types
 
