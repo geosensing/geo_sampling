@@ -71,7 +71,7 @@ For more information please visit the `project documentation page <http://geo-sa
 
 Downloads
 ==========
-As of February 4th, 2018, the package had been downloaded over 3,000 times (see the `saved BigQuery <https://bigquery.cloud.google.com/savedquery/267723140544:d95533161e5248229a0024535b625b0e>`__).
+As of February 4th, 2018, the package had been downloaded nearly 5,000 times (see the `saved BigQuery <https://console.cloud.google.com/bigquery?sq=267723140544:c57a4d5f24cd4bc7b8546d04928b5cc5>`__).
 
 Authors
 =======
