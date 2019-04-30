@@ -10,6 +10,8 @@ Geo sampling
 .. image:: https://readthedocs.org/projects/geo-sampling/badge/?version=latest
     :target: http://geo-sampling.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+.. image:: https://pepy.tech/badge/geo-sampling
+    :target: https://pepy.tech/project/geo-sampling
 
 Say you want to learn about the average number of potholes per kilometer of street in a city. Or estimate a similar such quantity. To estimate the quantity, you need to sample locations on the streets. This package helps you sample those locations. In particular, the package implements the following sampling strategy:
 
