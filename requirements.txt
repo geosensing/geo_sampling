@@ -10,4 +10,4 @@ Shapely==1.4.0
 utm==0.4.0
 Sphinx==1.4.5
 beautifulsoup4==4.5.1
-requests==2.10.0
+requests==2.20.0
