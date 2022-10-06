@@ -1,4 +1,4 @@
-Geo sampling
+Geo sampling: Randomly sample locations on streets
 ============
 
 .. image:: https://ci.appveyor.com/api/projects/status/2d42agdbafj0i3s7?svg=true
