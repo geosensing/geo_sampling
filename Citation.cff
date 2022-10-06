@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Sood"
+  given-names: "Gaurav"
+- family-names: "Laohaprapanon"
+  given-names: "Suriyan"
+title: "Geo sampling: Randomly Sample Locations on Streets"
+version: 0.1.0
+date-released: 2018-06-06
+url: "https://github.com/geosensing/geo_sampling"
