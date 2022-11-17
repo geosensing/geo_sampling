@@ -8,6 +8,7 @@ matplotlib==1.5.1
 pyproj==1.9.5.1
 Shapely==1.4.0
 utm==0.4.0
-Sphinx==1.4.5
+Sphinx==3.0.4
 beautifulsoup4==4.5.1
 requests==2.20.0
+urllib3>=1.26.5 # not directly required, pinned by Snyk to avoid a vulnerability
