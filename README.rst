@@ -1,8 +1,6 @@
 Geo sampling: Randomly sample locations on streets
-============
+===================================================
 
-.. image:: https://ci.appveyor.com/api/projects/status/2d42agdbafj0i3s7?svg=true
-    :target: https://ci.appveyor.com/project/geosensing/geo-sampling
 .. image:: https://travis-ci.org/geosensing/geo_sampling.svg?branch=public
     :target: https://travis-ci.org/geosensing/geo_sampling
 .. image:: https://img.shields.io/pypi/v/geo_sampling.svg?maxAge=3600
