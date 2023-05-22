@@ -120,7 +120,7 @@ setup(
         'Shapely==1.4.0',
         'utm==0.4.0',
         'beautifulsoup4==4.5.1',
-        'requests==2.20.0'
+        'requests==2.31.0'
     ],
 
     # List additional groups of dependencies here (e.g. development
