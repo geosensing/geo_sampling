@@ -7,3 +7,5 @@
 output.csv
 data
 .DS_Store
+/dist
+/geo_sampling.egg-info
