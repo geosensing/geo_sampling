@@ -1,3 +1,0 @@
-[console_scripts]
-geo_roads = geo_sampling.geo_roads:main
-sample_roads = geo_sampling.sample_roads:main
