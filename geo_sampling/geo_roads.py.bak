@@ -6,7 +6,7 @@ import csv
 import requests
 from bs4 import BeautifulSoup
 import zipfile
-import urllib.request, urllib.parse, urllib.error
+import urllib
 import time
 import shutil
 
@@ -36,7 +36,7 @@ def check_length(l):
             l = line.length
             print(l)
             total += l
-    print(("Total: {0}".format(total)))
+    print("Total: {0}".format(total))
 
 
 def output_to_file(writer, uid, osm_id, osm_name, osm_type, l):
@@ -104,7 +104,7 @@ def redistribute_vertices(geom, distance):
 def bbbike_generate_extract_link(args):
     if not os.path.exists('data/{0}_adm{1}.shp'
                           .format(args.ccode, args.level)):
-        print(("No boundary data at this level (level={0})".format(args.level)))
+        print("No boundary data at this level (level={0})".format(args.level))
         return None, None
 
     levels_type = []
@@ -147,9 +147,9 @@ def bbbike_generate_extract_link(args):
         print("All region names :-")
         for n in names:
             try:
-                print(("- {0}".format(n.encode('utf-8'))))
+                print("- {0}".format(n.encode('utf-8')))
             except:
-                print(("- {0}".format(n)))
+                print("- {0}".format(n))
         return None, None
 
     for s in sr:
@@ -198,7 +198,7 @@ def bbbike_generate_extract_link(args):
                       'sw_lat': sw_lat, 'sw_lng': sw_lng, 'ne_lat': ne_lat,
                       'ne_lng': ne_lng, 'email': 'geo_sampling@mailinator.com',
                       'as': 1, 'pg': 0}
-            encoded_params = urllib.parse.urlencode(params)
+            encoded_params = urllib.urlencode(params)
             base_url = 'http://extract.bbbike.org/?'
             url = base_url + encoded_params
             # Save BBBike data extract URL for debug
@@ -246,7 +246,7 @@ def main(argv=sys.argv[1:]):
     parser.add_argument('-c', '--country', dest='country', default=None,
                         help='Select country')
     parser.add_argument('-l', '--level', dest='level', default=1,
-                        type=int, choices=list(range(1, 5)),
+                        type=int, choices=range(1, 5),
                         help='Select administrative level')
     parser.add_argument('-n', '--name', dest='name', default=None,
                         help='Select region name')
@@ -271,10 +271,10 @@ def main(argv=sys.argv[1:]):
 
     countries = gadm_get_country_list()
 
-    if args.country not in list(countries.keys()):
+    if args.country not in countries.keys():
         print("All country list :-")
         for c in sorted(countries.keys()):
-            print(('- {0}'.format(c.encode('utf-8'))))
+            print('- {0}'.format(c.encode('utf-8')))
         print("Please specify a country name from above list with -c option.")
         sys.exit(-1)
 
@@ -345,7 +345,7 @@ def main(argv=sys.argv[1:]):
             selected = True
         else:
             selected = t in args.types
-        print(('{0} {1}'.format('*' if selected else '-', t)))
+        print('{0} {1}'.format('*' if selected else '-', t))
     print("You can specify the road types with -t. (* is selected)")
 
     lng, lat = sr[0].shape.points[0]
@@ -366,7 +366,7 @@ def main(argv=sys.argv[1:]):
             from matplotlib import colors
             import matplotlib.pyplot as plt
 
-            cvalues = list(colors.cnames.values())
+            cvalues = colors.cnames.values()
             road_colors = road_types if road_types else []
             fig, ax = plt.subplots(figsize=[14, 10])
             first = []

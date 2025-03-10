@@ -41,7 +41,7 @@ def main(argv=sys.argv[1:]):
             from matplotlib import colors
             import matplotlib.pyplot as plt
 
-            cvalues = list(colors.cnames.values())
+            cvalues = colors.cnames.values()
             road_colors = road_types if road_types else []
             fig, ax = plt.subplots(figsize=[14, 10])
             first = []
@@ -59,8 +59,8 @@ def main(argv=sys.argv[1:]):
     total = len(segments)
 
     if total < args.samples:
-        print(("Sample larger than population ({0} > {1})".format(args.samples,
-                                                                 total)))
+        print("Sample larger than population ({0} > {1})".format(args.samples,
+                                                                 total))
         sys.exit(-1)
 
     if args.samples == 0:
@@ -68,7 +68,7 @@ def main(argv=sys.argv[1:]):
         sample_segments = segments
     else:
         sample_segments = [segments[i] for i in
-                           sorted(random.sample(range(len(segments)),
+                           sorted(random.sample(xrange(len(segments)),
                                                 args.samples))]
 
     with open(args.output, 'wb') as f:

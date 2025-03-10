@@ -1,0 +1,13 @@
+pyshp>=2.3.1
+matplotlib>=3.5.0
+pyproj>=3.3.0
+Shapely>=2.0.0
+utm>=0.7.0
+beautifulsoup4>=4.10.0
+requests>=2.32.0
+
+[dev]
+check-manifest
+
+[test]
+coverage
