@@ -25,6 +25,9 @@ import zipfile
 import urllib.parse
 import requests
 
+from matplotlib import colors
+import matplotlib.pyplot as plt
+
 from bs4 import BeautifulSoup
 import shapefile  # pyshp
 from shapely.geometry import LineString, Polygon
@@ -349,13 +352,6 @@ def bbbike_check_download_link(args):
     return ""
 
 
-# Import matplotlib at the top level rather than inside a function
-try:
-    from matplotlib import colors
-    import matplotlib.pyplot as plt
-    MATPLOTLIB_AVAILABLE = True
-except ImportError:
-    MATPLOTLIB_AVAILABLE = False
 
 
 def main(argv=None):
@@ -489,14 +485,10 @@ def main(argv=None):
     selected_road_types = args.types
 
     if args.plot:
-        if not MATPLOTLIB_AVAILABLE:
-            print("WARNING: matplotlib is not installed")
-            args.plot = False
-        else:
-            c_values = list(colors.cnames.values())
-            road_colors = selected_road_types if selected_road_types else []
-            fig, axis = plt.subplots(figsize=(14, 10))
-            first = []
+        c_values = list(colors.cnames.values())
+        road_colors = selected_road_types if selected_road_types else []
+        fig, axis = plt.subplots(figsize=(14, 10))
+        first = []
 
     with open(args.output, "w", newline="", encoding="utf-8") as output_file:
         cols = [
@@ -522,7 +514,7 @@ def main(argv=None):
                 uid = output_to_file(
                     writer, uid, osm_id, osm_name, osm_type, new_segments
                 )
-                if args.plot and MATPLOTLIB_AVAILABLE:
+                if args.plot:
                     p_coords = new_segments.coords
                     x_coords = [pt[0] for pt in p_coords]
                     y_coords = [pt[1] for pt in p_coords]
@@ -537,7 +529,7 @@ def main(argv=None):
                     else:
                         axis.plot(x_coords, y_coords, color=color_val)
 
-    if args.plot and MATPLOTLIB_AVAILABLE:
+    if args.plot:
         axis.get_yaxis().get_major_formatter().set_useOffset(False)
         axis.get_yaxis().get_major_formatter().set_scientific(False)
         axis.get_xaxis().get_major_formatter().set_useOffset(False)
