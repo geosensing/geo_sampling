@@ -206,35 +206,36 @@ def redistribute_vertices(geom, distance):
             shp_path = f"data/{args.ccode}_adm{level}.shp"
             dbf_path = f"data/{args.ccode}_adm{level}.dbf"
             with open(shp_path, "rb") as shp, open(dbf_path, "rb") as dbf:
-            reader = shapefile.Reader(shp=shp, dbf=dbf)
-            shape_records = reader.shapeRecords()
-            idx = 0
-            engtype_idx = None
-            type_idx = None
-            name_idx = None
-            nl_name_idx = None
-            for field in reader.fields:
-                if isinstance(field, list):
-                    if field[0] == f"ENGTYPE_{level}":
-                        engtype_idx = idx
-                    if field[0] == f"TYPE_{level}":
-                        type_idx = idx
-                    if field[0] == f"NAME_{level}":
-                        name_idx = idx
-                    if field[0] == f"NL_NAME_{level}":
-                        nl_name_idx = idx
-                    idx += 1
-            if shape_records:
-                levels_engtype.append(shape_records[0].record[engtype_idx])
-                levels_type.append(shape_records[0].record[type_idx])
-                names_idx.append(name_idx)
-                nl_names_idx.append(nl_name_idx)
-            if level == args.level:
-                for rec_obj in shape_records:
-                    name_val = "+".join([rec_obj.record[i] for i in names_idx])
-                    names.append(name_val)
-                    nl_name_val = "+".join([rec_obj.record[i] for i in nl_names_idx])
-                    nl_names.append(nl_name_val)
+                reader = shapefile.Reader(shp=shp, dbf=dbf)
+                shape_records = reader.shapeRecords()
+                idx = 0
+                engtype_idx = None
+                type_idx = None
+                name_idx = None
+                nl_name_idx = None
+            
+                for field in reader.fields:
+                    if isinstance(field, list):
+                        if field[0] == f"ENGTYPE_{level}":
+                            engtype_idx = idx
+                        if field[0] == f"TYPE_{level}":
+                            type_idx = idx
+                        if field[0] == f"NAME_{level}":
+                            name_idx = idx
+                        if field[0] == f"NL_NAME_{level}":
+                            nl_name_idx = idx
+                        idx += 1
+                if shape_records:
+                    levels_engtype.append(shape_records[0].record[engtype_idx])
+                    levels_type.append(shape_records[0].record[type_idx])
+                    names_idx.append(name_idx)
+                    nl_names_idx.append(nl_name_idx)
+                if level == args.level:
+                    for rec_obj in shape_records:
+                        name_val = "+".join([rec_obj.record[i] for i in names_idx])
+                        names.append(name_val)
+                        nl_name_val = "+".join([rec_obj.record[i] for i in nl_names_idx])
+                        nl_names.append(nl_name_val)
     if args.name not in names:
         print("All region names :-")
         for name in names:
