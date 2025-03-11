@@ -6,11 +6,12 @@ Setup script for the geo-sampling package.
 This package provides scripts for sampling geo data sets by specific region name.
 """
 
+import codecs
+import os
+
 from setuptools import setup, find_packages
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-import codecs
-import os
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -35,7 +36,7 @@ class PostInstallCommand(install):
 
 setup(
     name="geo-sampling",
-    version="0.1.0",  # Increment version for Python 3.10+
+    version="0.1.1",
     description="Scripts for sampling Geo data sets by the specific region name",
     long_description=long_description,
     long_description_content_type="text/x-rst",
