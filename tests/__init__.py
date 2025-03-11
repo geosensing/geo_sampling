@@ -7,7 +7,7 @@ configurations for testing.
 
 import sys
 from contextlib import contextmanager
-from StringIO import StringIO
+from io import StringIO
 
 @contextmanager
 def capture(command, *args, **kwargs):
