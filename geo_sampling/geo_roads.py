@@ -36,12 +36,12 @@ import pyproj
 import utm
 
 from shapely.geometry import LineString, Polygon
-from shapely.ops import transform, cascaded_union
+from shapely.ops import transform, unary_union
 
 
 # Constants
 GADM_SHP_URL_FMT = (
-    "http://biogeo.ucdavis.edu/data/gadm2.8/shp/{0}_adm_shp.zip"
+    "https://geodata.ucdavis.edu/gadm/gadm4.1/shp/gadm41_{0}_shp.zip"
 )
 BBBIKE_MAX_POINTS = 300
 BBBIKE_MAX_WAIT = 50
@@ -106,7 +106,7 @@ def gadm_get_country_list():
     """
     Retrieve a list of countries and codes from GADM.
     """
-    resp = requests.get("http://gadm.org/download_country_v2.html")
+    resp = requests.get("https://gadm.org/download_country.html")
     countries = {}
     if resp.status_code == 200:
         soup = BeautifulSoup(resp.text, "html.parser")
@@ -181,66 +181,66 @@ def redistribute_vertices(geom, distance):
     raise ValueError(f"Unhandled geometry {geom.geom_type}")
 
 
-    def bbbike_generate_extract_link(args):
-        """
-        Generate a BBBike extract URL for a specified administrative boundary.
+def bbbike_generate_extract_link(args):
+    """
+    Generate a BBBike extract URL for a specified administrative boundary.
 
-        Args:
-            args (argparse.Namespace): Parsed command-line arguments.
+    Args:
+        args (argparse.Namespace): Parsed command-line arguments.
 
-        Returns:
-            tuple: (city, URL) if successful; otherwise (None, None).
-        """
-        shp_file = f"data/{args.ccode}_adm{args.level}.shp"
-        if not os.path.exists(shp_file):
-            print(f"No boundary data at this level (level={args.level})")
-            return None, None
+    Returns:
+        tuple: (city, URL) if successful; otherwise (None, None).
+    """
+    shp_file = f"data/gadm41_{args.ccode}_{args.level}.shp"
+    if not os.path.exists(shp_file):
+        print(f"No boundary data at this level (level={args.level})")
+        return None, None
 
-        levels_engtype = []
-        levels_type = []
-        names_idx = []
-        nl_names_idx = []
-        names = []
-        nl_names = []
-        for level in range(1, args.level + 1):
-            shp_path = f"data/{args.ccode}_adm{level}.shp"
-            dbf_path = f"data/{args.ccode}_adm{level}.dbf"
-            with open(shp_path, "rb") as shp, open(dbf_path, "rb") as dbf:
-                reader = shapefile.Reader(shp=shp, dbf=dbf)
-                shape_records = reader.shapeRecords()
-                idx = 0
-                engtype_idx = None
-                type_idx = None
-                name_idx = None
-                nl_name_idx = None
-            
-                for field in reader.fields:
-                    if isinstance(field, list):
-                        if field[0] == f"ENGTYPE_{level}":
-                            engtype_idx = idx
-                        if field[0] == f"TYPE_{level}":
-                            type_idx = idx
-                        if field[0] == f"NAME_{level}":
-                            name_idx = idx
-                        if field[0] == f"NL_NAME_{level}":
-                            nl_name_idx = idx
-                        idx += 1
-                if shape_records:
-                    levels_engtype.append(shape_records[0].record[engtype_idx])
-                    levels_type.append(shape_records[0].record[type_idx])
-                    names_idx.append(name_idx)
-                    nl_names_idx.append(nl_name_idx)
-                if level == args.level:
-                    for rec_obj in shape_records:
-                        name_val = "+".join([rec_obj.record[i] for i in names_idx])
-                        names.append(name_val)
-                        nl_name_val = "+".join([rec_obj.record[i] for i in nl_names_idx])
-                        nl_names.append(nl_name_val)
+    levels_engtype = []
+    levels_type = []
+    names_idx = []
+    nl_names_idx = []
+    names = []
+    nl_names = []
+    for level in range(1, args.level + 1):
+        shp_path = f"data/gadm41_{args.ccode}_{level}.shp"
+        dbf_path = f"data/gadm41_{args.ccode}_{level}.dbf"
+        with open(shp_path, "rb") as shp, open(dbf_path, "rb") as dbf:
+            reader = shapefile.Reader(shp=shp, dbf=dbf)
+            shape_records = reader.shapeRecords()
+            idx = 0
+            engtype_idx = None
+            type_idx = None
+            name_idx = None
+            nl_name_idx = None
+
+            for field in reader.fields:
+                if isinstance(field, list):
+                    if field[0] == f"ENGTYPE_{level}":
+                        engtype_idx = idx
+                    if field[0] == f"TYPE_{level}":
+                        type_idx = idx
+                    if field[0] == f"NAME_{level}":
+                        name_idx = idx
+                    if field[0] == f"NL_NAME_{level}":
+                        nl_name_idx = idx
+                    idx += 1
+            if shape_records:
+                levels_engtype.append(shape_records[0].record[engtype_idx])
+                levels_type.append(shape_records[0].record[type_idx])
+                names_idx.append(name_idx)
+                nl_names_idx.append(nl_name_idx)
+            if level == args.level:
+                for rec_obj in shape_records:
+                    name_val = "+".join([rec_obj.record[i] for i in names_idx])
+                    names.append(name_val)
+                    nl_name_val = "+".join([rec_obj.record[i] for i in nl_names_idx])
+                    nl_names.append(nl_name_val)
     if args.name not in names:
         print("All region names :-")
         for name in names:
             try:
-                print(f"- {name.encode('utf-8')}")
+                print(f"- {name}")
             except Exception:  # pylint: disable=broad-except
                 print(f"- {name}")
         return None, None
@@ -273,7 +273,7 @@ def redistribute_vertices(geom, distance):
                     )
                     extra_polygons.append(connecting_line.buffer(0.00001))
             polygon_list.extend(extra_polygons)
-            union_poly = cascaded_union(polygon_list)
+            union_poly = unary_union(polygon_list)
             boundary_line = LineString(union_poly.exterior.coords)
             new_length = boundary_line.length / BBBIKE_MAX_POINTS
             new_line = redistribute_vertices(boundary_line, new_length)
@@ -296,7 +296,7 @@ def redistribute_vertices(geom, distance):
                 "pg": 0,
             }
             encoded_params = urllib.parse.urlencode(params)
-            base_url = "http://extract.bbbike.org/?"
+            base_url = "https://extract.bbbike.org/?"
             url = base_url + encoded_params
             file_name = f"bbbike_{args.ccode}_{args.name}.txt"
             with open(file_name, "w", encoding="utf-8") as out_file:
@@ -334,7 +334,7 @@ def bbbike_check_download_link(args):
     wait_time = 0
     while wait_time < BBBIKE_MAX_WAIT:
         try:
-            response = requests.get("http://download.bbbike.org/osm/extract/?date=all")
+            response = requests.get("https://download.bbbike.org/osm/extract/?date=all")
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, "html.parser")
                 city_span = soup.find("span", {"title": args.city})
@@ -345,7 +345,7 @@ def bbbike_check_download_link(args):
                         link_tag = dl_section.find("a")
                         if link_tag:
                             href = link_tag["href"]
-                            return "http://download.bbbike.org/" + href
+                            return "https://download.bbbike.org/" + href
             print("Waiting for download link ready (15s)...")
             time.sleep(15)
         except KeyboardInterrupt as err:
@@ -413,7 +413,7 @@ def main(argv=None):
     if args.country not in list(countries.keys()):
         print("All country list :-")
         for country in sorted(countries.keys()):
-            print(f"- {country.encode('utf-8')}")  # Fixed: using f-string
+            print(f"- {country}")  # Fixed: using f-string
         print("Please specify a country name from above list with -c option.")
         sys.exit(-1)
 
@@ -421,7 +421,7 @@ def main(argv=None):
         os.makedirs("data")
 
     args.ccode = countries[args.country].split("_")[0]
-    gadm_shp_file = f"data/{args.ccode}_adm_shp.zip"  # Fixed: using f-string
+    gadm_shp_file = f"data/gadm41_{args.ccode}_shp.zip"  # Fixed: using f-string
     if os.path.exists(gadm_shp_file):
         print("Using exists administrative boundary data file...")
     else:
@@ -431,7 +431,7 @@ def main(argv=None):
     with zipfile.ZipFile(gadm_shp_file, "r") as zip_file:
         for file in zip_file.namelist():
             for level in range(1, args.level + 1):
-                pattern = fr".*adm{level}\.(:?dbf|shp)"
+                pattern = fr".*_{args.ccode}_{level}\.(:?dbf|shp)"
                 if re.match(pattern, file):
                     zip_file.extract(file, "data")
 
@@ -453,6 +453,18 @@ def main(argv=None):
             download_url(url, osm_shape_filename)
 
     print("Extract OSM data file (Roads shapefile)...")
+    zip_file = zipfile.ZipFile(osm_shape_filename, 'r')
+    for file in zip_file.namelist():
+        fn = os.path.basename(file)
+        if re.match('roads.(:?dbf|shp)', fn):
+            # copy file (taken from zipfile's extract)
+            source = zip_file.open(file)
+            target = open(os.path.join('data',
+                          args.ccode + '_' + args.name + '_' + fn), "wb")
+            with source, target:
+                shutil.copyfileobj(source, target)
+    zip_file.close()
+
     shp_path = f"data/{args.ccode}_{args.name}_roads.shp"  # Fixed: using f-string
     dbf_path = f"data/{args.ccode}_{args.name}_roads.dbf"  # Fixed: using f-string
     with open(shp_path, "rb") as shp_file, open(dbf_path, "rb") as dbf_file:
@@ -471,19 +483,19 @@ def main(argv=None):
 
     # Determine UTM zone for coordinate transformation
     lng, lat = shape_records[0].shape.points[0]
-    _, _, zone_x, zone_y = utm.from_latlon(lat, lng)
-    utm_zone = f"{zone_x:d}{zone_y}"  # Fixed: using f-string
+    _, _, zone_x, _ = utm.from_latlon(lat, lng)
 
-    wgs_to_utm = partial(
-        pyproj.transform,
-        pyproj.Proj(init="EPSG:4326"),
-        pyproj.Proj(f"+proj=utm +zone={utm_zone}")  # Fixed: using f-string
-    )
-    utm_to_wgs = partial(
-        pyproj.transform,
-        pyproj.Proj(f"+proj=utm +zone={utm_zone}"),  # Fixed: using f-string
-        pyproj.Proj(init="EPSG:4326")
-    )
+    # Define the coordinate reference systems
+    wgs84 = pyproj.CRS.from_epsg(4326)  # WGS84
+    utm_crs = pyproj.CRS.from_proj4(f"+proj=utm +zone={zone_x} +datum=WGS84 +units=m +no_defs")
+
+    # Create transformer objects
+    wgs_to_utm_transformer = pyproj.Transformer.from_crs(wgs84, utm_crs, always_xy=True).transform
+    utm_to_wgs_transformer = pyproj.Transformer.from_crs(utm_crs, wgs84, always_xy=True).transform
+
+    # Use partial to make the functions similar to the old code
+    wgs_to_utm = partial(wgs_to_utm_transformer)
+    utm_to_wgs = partial(utm_to_wgs_transformer)
 
     uid = 0
     selected_road_types = args.types
