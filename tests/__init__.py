@@ -1,10 +1,13 @@
+"""
+Test package for geo_sampling.
+
+This module initializes the test package and sets up any required
+configurations for testing.
+"""
+
 import sys
 from contextlib import contextmanager
-try:
-    from StringIO import StringIO
-except:
-    from io import StringIO
-
+from StringIO import StringIO
 
 @contextmanager
 def capture(command, *args, **kwargs):
