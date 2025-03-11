@@ -29,7 +29,7 @@ class TestGeoRoads(unittest.TestCase):
     def test_geo_roads(self):
         with capture(main, ['-l', ADM_LEVEL, '-c', COUNTRY_NAME, '-n',
                             REGION_NAME]) as output:
-            self.assertRegexpMatches(output, r'Done$')
+            self.assertRegex(output, r'Done$')
 
 
 if __name__ == '__main__':
