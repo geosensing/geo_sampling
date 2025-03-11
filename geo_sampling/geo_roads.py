@@ -23,18 +23,21 @@ import time
 import shutil
 import zipfile
 import urllib.parse
+from functools import partial
 import requests
 
 from matplotlib import colors
 import matplotlib.pyplot as plt
 
 from bs4 import BeautifulSoup
-import shapefile  # pyshp
-from shapely.geometry import LineString, Polygon
-from functools import partial
+import shapefile
+
 import pyproj
-from shapely.ops import transform, cascaded_union
 import utm
+
+from shapely.geometry import LineString, Polygon
+from shapely.ops import transform, cascaded_union
+
 
 # Constants
 GADM_SHP_URL_FMT = (
@@ -62,7 +65,7 @@ def check_length(line_obj):
     print(f"Total: {total}")
 
 
-def output_to_file(writer, uid, osm_id, osm_name, osm_type, line_obj):  # pylint: disable=too-many-arguments
+def output_to_file(writer, uid, osm_id, osm_name, osm_type, line_obj):
     """
     Write segments of a LineString to CSV.
 
@@ -80,10 +83,10 @@ def output_to_file(writer, uid, osm_id, osm_name, osm_type, line_obj):  # pylint
     previous = None
     for point in line_obj.coords:
         if previous is None:
-            previous = point
+            previous = tuple(point)
         else:
-            start_long, start_lat = previous
-            end_long, end_lat = point
+            start_long, start_lat = tuple(previous)
+            end_long, end_lat = tuple(point)
             writer.writerow({
                 "segment_id": uid,
                 "osm_id": osm_id,
@@ -174,35 +177,35 @@ def redistribute_vertices(geom, distance):
     if geom.geom_type == "MultiLineString":
         parts = [redistribute_vertices(part, distance) for part in geom]
         return type(geom)([p for p in parts if not p.is_empty])
-    
+
     raise ValueError(f"Unhandled geometry {geom.geom_type}")
 
 
-def bbbike_generate_extract_link(args):  # pylint: disable=too-many-locals
-    """
-    Generate a BBBike extract URL for a specified administrative boundary.
+    def bbbike_generate_extract_link(args):
+        """
+        Generate a BBBike extract URL for a specified administrative boundary.
 
-    Args:
-        args (argparse.Namespace): Parsed command-line arguments.
+        Args:
+            args (argparse.Namespace): Parsed command-line arguments.
 
-    Returns:
-        tuple: (city, URL) if successful; otherwise (None, None).
-    """
-    shp_file = f"data/{args.ccode}_adm{args.level}.shp"
-    if not os.path.exists(shp_file):
-        print(f"No boundary data at this level (level={args.level})")
-        return None, None
+        Returns:
+            tuple: (city, URL) if successful; otherwise (None, None).
+        """
+        shp_file = f"data/{args.ccode}_adm{args.level}.shp"
+        if not os.path.exists(shp_file):
+            print(f"No boundary data at this level (level={args.level})")
+            return None, None
 
-    levels_engtype = []
-    levels_type = []
-    names_idx = []
-    nl_names_idx = []
-    names = []
-    nl_names = []
-    for level in range(1, args.level + 1):
-        shp_path = f"data/{args.ccode}_adm{level}.shp"
-        dbf_path = f"data/{args.ccode}_adm{level}.dbf"
-        with open(shp_path, "rb") as shp, open(dbf_path, "rb") as dbf:
+        levels_engtype = []
+        levels_type = []
+        names_idx = []
+        nl_names_idx = []
+        names = []
+        nl_names = []
+        for level in range(1, args.level + 1):
+            shp_path = f"data/{args.ccode}_adm{level}.shp"
+            dbf_path = f"data/{args.ccode}_adm{level}.dbf"
+            with open(shp_path, "rb") as shp, open(dbf_path, "rb") as dbf:
             reader = shapefile.Reader(shp=shp, dbf=dbf)
             shape_records = reader.shapeRecords()
             idx = 0
@@ -427,7 +430,7 @@ def main(argv=None):
     with zipfile.ZipFile(gadm_shp_file, "r") as zip_file:
         for file in zip_file.namelist():
             for level in range(1, args.level + 1):
-                pattern = f".*adm{level}\.(:?dbf|shp)"  # Fixed: using f-string
+                pattern = fr".*adm{level}\.(:?dbf|shp)"
                 if re.match(pattern, file):
                     zip_file.extract(file, "data")
 
@@ -541,7 +544,5 @@ def main(argv=None):
     print("Done")
     return 0
 
-
 if __name__ == "__main__":
     sys.exit(main())
-
