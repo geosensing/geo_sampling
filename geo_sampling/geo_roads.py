@@ -1,304 +1,443 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Process geo roads data to sample road segments, generate BBBike extract links,
+and optionally plot the output.
+
+This script:
+    - Downloads GADM boundaries if needed.
+    - Downloads OSM data from BBBike.org.
+    - Extracts road segments from a roads shapefile.
+    - Splits long segments into chunks (default 500 m).
+    - Writes output to a CSV file.
+    - Optionally plots the segments.
+"""
+
 import sys
 import re
 import os
 import argparse
 import csv
-import requests
-from bs4 import BeautifulSoup
-import zipfile
-import urllib.request, urllib.parse, urllib.error
+import random
 import time
 import shutil
+import zipfile
+import urllib.parse
+import requests
 
-import shapefile  # https://pypi.python.org/pypi/pyshp
+from bs4 import BeautifulSoup
+import shapefile  # pyshp
 from shapely.geometry import LineString, Polygon
 from functools import partial
 import pyproj
 from shapely.ops import transform, cascaded_union
 import utm
 
-GADM_SHP_URL_FMT = 'http://biogeo.ucdavis.edu/data/gadm2.8/shp/{0}_adm_shp.zip'
-
-# To workaround request entity too large in URL request
+# Constants
+GADM_SHP_URL_FMT = (
+    "http://biogeo.ucdavis.edu/data/gadm2.8/shp/{0}_adm_shp.zip"
+)
 BBBIKE_MAX_POINTS = 300
 BBBIKE_MAX_WAIT = 50
 
 
-def check_length(l):
+def check_length(line_obj):
+    """
+    Print the lengths of segments in a LineString and the total length.
+    """
     total = 0.0
-    prev = None
-    for p in l.coords:
-        if prev is None:
-            prev = p
+    previous = None
+    for point in line_obj.coords:
+        if previous is None:
+            previous = point
         else:
-            line = LineString([prev, p])
-            prev = p
-            l = line.length
-            print(l)
-            total += l
-    print(("Total: {0}".format(total)))
+            segment = LineString([previous, point])
+            seg_length = segment.length
+            print(seg_length)
+            total += seg_length
+            previous = point
+    print(f"Total: {total}")
 
 
-def output_to_file(writer, uid, osm_id, osm_name, osm_type, l):
-    prev = None
-    for p in l.coords:
-        if prev is None:
-            prev = p
+def output_to_file(writer, uid, osm_id, osm_name, osm_type, line_obj):  # pylint: disable=too-many-arguments
+    """
+    Write segments of a LineString to CSV.
+
+    Args:
+        writer (csv.DictWriter): CSV writer.
+        uid (int): Current segment ID.
+        osm_id: OSM identifier.
+        osm_name: OSM name.
+        osm_type: OSM type.
+        line_obj (LineString): Shapely LineString object.
+
+    Returns:
+        int: Updated segment ID.
+    """
+    previous = None
+    for point in line_obj.coords:
+        if previous is None:
+            previous = point
         else:
-            start_long, start_lat = prev
-            end_long, end_lat = p
-            writer.writerow({'segment_id': uid, 'osm_id': osm_id,
-                             'osm_name': osm_name, 'osm_type': osm_type,
-                             'start_lat': start_lat, 'start_long': start_long,
-                             'end_lat': end_lat, 'end_long': end_long})
+            start_long, start_lat = previous
+            end_long, end_lat = point
+            writer.writerow({
+                "segment_id": uid,
+                "osm_id": osm_id,
+                "osm_name": osm_name,
+                "osm_type": osm_type,
+                "start_lat": start_lat,
+                "start_long": start_long,
+                "end_lat": end_lat,
+                "end_long": end_long,
+            })
             uid += 1
-            prev = p
+            previous = point
     return uid
 
 
 def gadm_get_country_list():
-    r = requests.get('http://gadm.org/download_country_v2.html')
+    """
+    Retrieve a list of countries and codes from GADM.
+    """
+    resp = requests.get("http://gadm.org/download_country_v2.html")
     countries = {}
-    if r.status_code == 200:
-        soup = BeautifulSoup(r.text, 'html.parser')
-        for opt in soup.find('select', {'name': 'country'}).find_all('option'):
-            countries[opt.text.strip()] = opt['value']
+    if resp.status_code == 200:
+        soup = BeautifulSoup(resp.text, "html.parser")
+        select_tag = soup.find("select", {"name": "country"})
+        if select_tag:
+            for opt in select_tag.find_all("option"):
+                countries[opt.text.strip()] = opt["value"]
     return countries
 
 
-def download_url(url, local):
-    # NOTE the stream=True parameter
-    r = requests.get(url, stream=True)
-    with open(local, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=1024):
-            if chunk:  # filter out keep-alive new chunks
-                f.write(chunk)
+def download_url(url, local_path):
+    """
+    Download a URL to a local file.
+
+    Args:
+        url (str): The URL to download.
+        local_path (str): Path to save the file.
+    """
+    resp = requests.get(url, stream=True)
+    with open(local_path, "wb") as out_file:
+        for chunk in resp.iter_content(chunk_size=1024):
+            if chunk:
+                out_file.write(chunk)
 
 
 def gadm_download_country_data(ccode):
+    """
+    Download GADM boundary data for a country.
+
+    Args:
+        ccode (str): Country code.
+
+    Returns:
+        str: Local filename of downloaded data.
+    """
     url = GADM_SHP_URL_FMT.format(ccode)
-    local_filename = 'data/' + url.split('/')[-1]
+    local_filename = os.path.join("data", url.rsplit('/', maxsplit=1)[-1])
     download_url(url, local_filename)
     return local_filename
 
 
 def redistribute_vertices(geom, distance):
-    if geom.geom_type == 'LineString':
-        num_vert = int(round(geom.length / distance))
-        num_vert_div = geom.length / distance
-        if num_vert == 0:
-            num_vert = 1
-        return LineString(
-            [geom.interpolate(float(n) / num_vert_div, normalized=True)
-             for n in range(num_vert)] +
-            [geom.interpolate(1, normalized=True)])
+    """
+    Redistribute vertices along a LineString to achieve approximately equal
+    segments of a given distance.
 
-    elif geom.geom_type == 'MultiLineString':
-        parts = [redistribute_vertices(part, distance)
-                 for part in geom]
+    Args:
+        geom (LineString): The original LineString.
+        distance (float): Desired segment length in meters.
+
+    Returns:
+        LineString: New LineString with redistributed vertices.
+
+    Raises:
+        ValueError: If geometry type is unhandled.
+    """
+    if geom.geom_type == "LineString":
+        num_vertices = int(round(geom.length / distance))
+        num_div = geom.length / distance
+        if num_vertices == 0:
+            num_vertices = 1
+        new_points = [
+            geom.interpolate(float(i) / num_div, normalized=True)
+            for i in range(num_vertices)
+        ]
+        new_points.append(geom.interpolate(1, normalized=True))
+        return LineString(new_points)
+    if geom.geom_type == "MultiLineString":
+        parts = [redistribute_vertices(part, distance) for part in geom]
         return type(geom)([p for p in parts if not p.is_empty])
-    else:
-        raise ValueError('unhandled geometry %s', (geom.geom_type,))
+    
+    raise ValueError(f"Unhandled geometry {geom.geom_type}")
 
 
-def bbbike_generate_extract_link(args):
-    if not os.path.exists('data/{0}_adm{1}.shp'
-                          .format(args.ccode, args.level)):
-        print(("No boundary data at this level (level={0})".format(args.level)))
+def bbbike_generate_extract_link(args):  # pylint: disable=too-many-locals
+    """
+    Generate a BBBike extract URL for a specified administrative boundary.
+
+    Args:
+        args (argparse.Namespace): Parsed command-line arguments.
+
+    Returns:
+        tuple: (city, URL) if successful; otherwise (None, None).
+    """
+    shp_file = f"data/{args.ccode}_adm{args.level}.shp"
+    if not os.path.exists(shp_file):
+        print(f"No boundary data at this level (level={args.level})")
         return None, None
 
-    levels_type = []
     levels_engtype = []
+    levels_type = []
     names_idx = []
     nl_names_idx = []
     names = []
     nl_names = []
-    for l in range(1, args.level + 1):
-        shp = open('data/{0}_adm{1}.shp'.format(args.ccode, l), 'rb')
-        dbf = open('data/{0}_adm{1}.dbf'.format(args.ccode, l), 'rb')
-
-        reader = shapefile.Reader(shp=shp, dbf=dbf)
-        sr = reader.shapeRecords()
-        idx = 0
-        for f in reader.fields:
-            if type(f) == list:
-                if f[0] == 'ENGTYPE_{0:d}'.format(l):
-                    engtype_idx = idx
-                if f[0] == 'TYPE_{0:d}'.format(l):
-                    type_idx = idx
-                if f[0] == 'NAME_{0:d}'.format(l):
-                    name_idx = idx
-                if f[0] == 'NL_NAME_{0:d}'.format(l):
-                    nl_name_idx = idx
-                idx += 1
-        if len(sr):
-            levels_engtype.append(sr[0].record[engtype_idx])
-            levels_type.append(sr[0].record[type_idx])
-            names_idx.append(name_idx)
-            nl_names_idx.append(nl_name_idx)
-        if l == args.level:
-            for s in sr:
-                name = '+'.join([s.record[i] for i in names_idx])
-                names.append(name)
-                nl_name = '+'.join([s.record[i] for i in nl_names_idx])
-                nl_names.append(nl_name)
-
+    for level in range(1, args.level + 1):
+        shp_path = f"data/{args.ccode}_adm{level}.shp"
+        dbf_path = f"data/{args.ccode}_adm{level}.dbf"
+        with open(shp_path, "rb") as shp, open(dbf_path, "rb") as dbf:
+            reader = shapefile.Reader(shp=shp, dbf=dbf)
+            shape_records = reader.shapeRecords()
+            idx = 0
+            engtype_idx = None
+            type_idx = None
+            name_idx = None
+            nl_name_idx = None
+            for field in reader.fields:
+                if isinstance(field, list):
+                    if field[0] == f"ENGTYPE_{level}":
+                        engtype_idx = idx
+                    if field[0] == f"TYPE_{level}":
+                        type_idx = idx
+                    if field[0] == f"NAME_{level}":
+                        name_idx = idx
+                    if field[0] == f"NL_NAME_{level}":
+                        nl_name_idx = idx
+                    idx += 1
+            if shape_records:
+                levels_engtype.append(shape_records[0].record[engtype_idx])
+                levels_type.append(shape_records[0].record[type_idx])
+                names_idx.append(name_idx)
+                nl_names_idx.append(nl_name_idx)
+            if level == args.level:
+                for rec_obj in shape_records:
+                    name_val = "+".join([rec_obj.record[i] for i in names_idx])
+                    names.append(name_val)
+                    nl_name_val = "+".join([rec_obj.record[i] for i in nl_names_idx])
+                    nl_names.append(nl_name_val)
     if args.name not in names:
         print("All region names :-")
-        for n in names:
+        for name in names:
             try:
-                print(("- {0}".format(n.encode('utf-8'))))
-            except:
-                print(("- {0}".format(n)))
+                print(f"- {name.encode('utf-8')}")
+            except Exception:  # pylint: disable=broad-except
+                print(f"- {name}")
         return None, None
-
-    for s in sr:
-        name = '+'.join([s.record[i] for i in names_idx])
-        if args.name == name:
+    for rec_obj in shape_records:
+        name_val = "+".join([rec_obj.record[i] for i in names_idx])
+        if args.name == name_val:
             points = []
-            # Split boundary line for each parts
-            lines = []
-            pp = 0
-            for p in s.shape.parts:
-                if p != 0:
-                    lines.append(s.shape.points[pp:p])
-                    pp = p
-            lines.append(s.shape.points[p:])
-            pg_list = []
-            # Find maximum area part
-            ma = 0
-            mp = None
-            for l in lines:
-                pg = Polygon(l)
-                a = pg.area
-                if a > ma:
-                    ma = a
-                    mp = pg
-                pg_list.append(pg)
-            # Create extra polygon to connect all multi-parts boundary
-            x_pg_list = []
-            for p in pg_list:
-                if p != mp:
-                    line = LineString([p.centroid, mp.centroid])
-                    x_pg_list.append(line.buffer(0.00001))
-            pg_list.extend(x_pg_list)
-            new_pg_list = cascaded_union(pg_list)
-            line = LineString(new_pg_list.exterior.coords)
-            # Simplify boundary line to workaround
-            # Request entity too large due to too long URL request.
-            new_len = line.length / BBBIKE_MAX_POINTS
-            new_line = redistribute_vertices(line, new_len)
+            parts = []
+            part_start = 0
+            for part in rec_obj.shape.parts:
+                if part != 0:
+                    parts.append(rec_obj.shape.points[part_start:part])
+                    part_start = part
+            parts.append(rec_obj.shape.points[part_start:])
+            polygon_list = []
+            max_area = 0
+            max_polygon = None
+            for line_points in parts:
+                poly = Polygon(line_points)
+                area = poly.area
+                if area > max_area:
+                    max_area = area
+                    max_polygon = poly
+                polygon_list.append(poly)
+            extra_polygons = []
+            for poly in polygon_list:
+                if poly != max_polygon:
+                    connecting_line = LineString(
+                        [poly.centroid, max_polygon.centroid]
+                    )
+                    extra_polygons.append(connecting_line.buffer(0.00001))
+            polygon_list.extend(extra_polygons)
+            union_poly = cascaded_union(polygon_list)
+            boundary_line = LineString(union_poly.exterior.coords)
+            new_length = boundary_line.length / BBBIKE_MAX_POINTS
+            new_line = redistribute_vertices(boundary_line, new_length)
             for lat, lng in new_line.coords:
-                points.append('{0:.3f},{1:.3f}'.format(lat, lng))
-            coords = '|'.join(points)
-            sw_lng, sw_lat, ne_lng, ne_lat = s.shape.bbox
-            city = args.ccode + '_' + args.name
-            fmt = 'shp.zip'
-            params = {'city': city, 'coords': coords, 'format': fmt,
-                      'sw_lat': sw_lat, 'sw_lng': sw_lng, 'ne_lat': ne_lat,
-                      'ne_lng': ne_lng, 'email': 'geo_sampling@mailinator.com',
-                      'as': 1, 'pg': 0}
+                points.append(f"{lat:.3f},{lng:.3f}")
+            coords = "|".join(points)
+            sw_lng, sw_lat, ne_lng, ne_lat = rec_obj.shape.bbox
+            city = f"{args.ccode}_{args.name}"
+            extract_format = "shp.zip"
+            params = {
+                "city": city,
+                "coords": coords,
+                "format": extract_format,
+                "sw_lat": sw_lat,
+                "sw_lng": sw_lng,
+                "ne_lat": ne_lat,
+                "ne_lng": ne_lng,
+                "email": "geo_sampling@mailinator.com",
+                "as": 1,
+                "pg": 0,
+            }
             encoded_params = urllib.parse.urlencode(params)
-            base_url = 'http://extract.bbbike.org/?'
+            base_url = "http://extract.bbbike.org/?"
             url = base_url + encoded_params
-            # Save BBBike data extract URL for debug
-            fn = 'bbbike_{0}_{1}.txt'.format(args.ccode, args.name)
-            with open(fn, 'wb') as f:
-                f.write(url)
+            file_name = f"bbbike_{args.ccode}_{args.name}.txt"
+            with open(file_name, "w", encoding="utf-8") as out_file:
+                out_file.write(url)
             return city, url
 
 
 def bbbike_submit_extract_link(args):
-    r = requests.get(args.bbbike_url + "&submit=1")
-    if r.status_code == 200:
+    """
+    Submit the extract link to BBBike.org.
+
+    Args:
+        args (argparse.Namespace): Parsed command-line arguments.
+
+    Returns:
+        bool: True if submission is successful, False otherwise.
+    """
+    response = requests.get(args.bbbike_url + "&submit=1")
+    if response.status_code == 200:
         print("Extract link submitted")
         return True
-    else:
-        return False
+    return False
 
 
 def bbbike_check_download_link(args):
-    wait = 0
-    while wait < BBBIKE_MAX_WAIT:
+    """
+    Check for the download link on BBBike.org until it is ready or times out.
+
+    Args:
+        args (argparse.Namespace): Parsed command-line arguments.
+
+    Returns:
+        str: The download link if found; otherwise an empty string.
+    """
+    wait_time = 0
+    while wait_time < BBBIKE_MAX_WAIT:
         try:
-            r = requests.get('http://download.bbbike.org/osm/extract/?date=all')
-            if r.status_code == 200:
-                soup = BeautifulSoup(r.text, 'html.parser')
-                city_span = soup.find('span', {'title': args.city})
+            response = requests.get("http://download.bbbike.org/osm/extract/?date=all")
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, "html.parser")
+                city_span = soup.find("span", {"title": args.city})
                 if city_span:
-                    dl = city_span.parent.find_next_siblings()[2]
-                    link = dl.find('a')
-                    if link:
-                        href = link['href']
-                        return 'http://download.bbbike.org/' + href
+                    siblings = city_span.parent.find_next_siblings()
+                    if len(siblings) >= 3:
+                        dl_section = siblings[2]
+                        link_tag = dl_section.find("a")
+                        if link_tag:
+                            href = link_tag["href"]
+                            return "http://download.bbbike.org/" + href
             print("Waiting for download link ready (15s)...")
             time.sleep(15)
-        except KeyboardInterrupt as e:
-            print(e)
+        except KeyboardInterrupt as err:
+            print(err)
             break
-        wait += 1
+        wait_time += 1
     print("Cannot get download link from BBBike.org")
-    return ''
+    return ""
 
 
-def main(argv=sys.argv[1:]):
-    parser = argparse.ArgumentParser(description='Geo roads data')
-    parser.add_argument('-c', '--country', dest='country', default=None,
-                        help='Select country')
-    parser.add_argument('-l', '--level', dest='level', default=1,
-                        type=int, choices=list(range(1, 5)),
-                        help='Select administrative level')
-    parser.add_argument('-n', '--name', dest='name', default=None,
-                        help='Select region name')
-    parser.add_argument('-t', '--types', nargs='+', dest='types',
-                        default=None,
-                        help='Select road types (list)')
-    parser.add_argument('-o', '--output', default='output.csv',
-                        help='Output file name')
-    parser.add_argument('-d', '--distance', dest='distance', type=int,
-                        default=500,
-                        help='Distance in meters to split')
-    parser.add_argument('--no-header', dest='noheader', action='store_true',
-                        help='Output without the header')
+# Import matplotlib at the top level rather than inside a function
+try:
+    from matplotlib import colors
+    import matplotlib.pyplot as plt
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+
+
+def main(argv=None):
+    """
+    Main function for processing geo roads data and generating BBBike extract links.
+
+    Args:
+        argv (list): Command-line arguments.
+
+    Returns:
+        int: Exit code.
+    """
+    if argv is None:
+        argv = sys.argv[1:]
+    parser = argparse.ArgumentParser(description="Geo roads data")
+    parser.add_argument(
+        "-c", "--country", dest="country", default=None,
+        help="Select country"
+    )
+    parser.add_argument(
+        "-l", "--level", dest="level", default=1, type=int,
+        choices=list(range(1, 5)), help="Select administrative level"
+    )
+    parser.add_argument(
+        "-n", "--name", dest="name", default=None,
+        help="Select region name"
+    )
+    parser.add_argument(
+        "-t", "--types", nargs="+", dest="types", default=None,
+        help="Select road types (list)"
+    )
+    parser.add_argument(
+        "-o", "--output", default="output.csv",
+        help="Output file name"
+    )
+    parser.add_argument(
+        "-d", "--distance", dest="distance", type=int, default=500,
+        help="Distance in meters to split"
+    )
+    parser.add_argument(
+        "--no-header", dest="noheader", action="store_true",
+        help="Output without the header"
+    )
     parser.set_defaults(noheader=False)
-    parser.add_argument('--plot', dest='plot', action='store_true',
-                        help='Plot the output')
+    parser.add_argument(
+        "--plot", dest="plot", action="store_true",
+        help="Plot the output"
+    )
     parser.set_defaults(plot=False)
 
     args = parser.parse_args(argv)
-
     print(args)
 
     countries = gadm_get_country_list()
-
     if args.country not in list(countries.keys()):
         print("All country list :-")
-        for c in sorted(countries.keys()):
-            print(('- {0}'.format(c.encode('utf-8'))))
+        for country in sorted(countries.keys()):
+            print(f"- {country.encode('utf-8')}")  # Fixed: using f-string
         print("Please specify a country name from above list with -c option.")
         sys.exit(-1)
 
-    if not os.path.exists('data'):
-        os.makedirs('data')
+    if not os.path.exists("data"):
+        os.makedirs("data")
 
-    args.ccode = countries[args.country].split('_')[0]
-    gadm_shp_file = 'data/{0}_adm_shp.zip'.format(args.ccode)
+    args.ccode = countries[args.country].split("_")[0]
+    gadm_shp_file = f"data/{args.ccode}_adm_shp.zip"  # Fixed: using f-string
     if os.path.exists(gadm_shp_file):
         print("Using exists administrative boundary data file...")
     else:
         print("Download administrative boundary data file...")
         gadm_shp_file = gadm_download_country_data(args.ccode)
 
-    zip_file = zipfile.ZipFile(gadm_shp_file, 'r')
-    for file in zip_file.namelist():
-        for l in range(1, args.level + 1):
-            if re.match('.*adm{0}\.(:?dbf|shp)'.format(l), file):
-                zip_file.extract(file, 'data')
-    zip_file.close()
+    with zipfile.ZipFile(gadm_shp_file, "r") as zip_file:
+        for file in zip_file.namelist():
+            for level in range(1, args.level + 1):
+                pattern = f".*adm{level}\.(:?dbf|shp)"  # Fixed: using f-string
+                if re.match(pattern, file):
+                    zip_file.extract(file, "data")
 
-    osm_shape_filename = ('data/{0}_{1}_osm.shp.zip'
-                          .format(args.ccode, args.name))
+    print("Boundary data extracted.")
 
+    osm_shape_filename = f"data/{args.ccode}_{args.name}_osm.shp.zip"  # Fixed: using f-string
     if os.path.exists(osm_shape_filename):
         print("Using exists OSM data file...")
     else:
@@ -314,111 +453,97 @@ def main(argv=sys.argv[1:]):
             download_url(url, osm_shape_filename)
 
     print("Extract OSM data file (Roads shapefile)...")
-    zip_file = zipfile.ZipFile(osm_shape_filename, 'r')
-    for file in zip_file.namelist():
-        fn = os.path.basename(file)
-        if re.match('roads.(:?dbf|shp)', fn):
-            # copy file (taken from zipfile's extract)
-            source = zip_file.open(file)
-            target = open(os.path.join('data',
-                          args.ccode + '_' + args.name + '_' + fn), "wb")
-            with source, target:
-                shutil.copyfileobj(source, target)
-    zip_file.close()
-
-    print("Read and process Roads shapefile...")
-    shp = open('data/{0}_{1}_roads.shp'.format(args.ccode, args.name), 'rb')
-    dbf = open('data/{0}_{1}_roads.dbf'.format(args.ccode, args.name), 'rb')
-
-    reader = shapefile.Reader(shp=shp, dbf=dbf)
-
-    sr = reader.shapeRecords()
+    shp_path = f"data/{args.ccode}_{args.name}_roads.shp"  # Fixed: using f-string
+    dbf_path = f"data/{args.ccode}_{args.name}_roads.dbf"  # Fixed: using f-string
+    with open(shp_path, "rb") as shp_file, open(dbf_path, "rb") as dbf_file:
+        reader = shapefile.Reader(shp=shp_file, dbf=dbf_file)
+        shape_records = reader.shapeRecords()
 
     type_index = 3
-    types = set()
-    for s in sr:
-        name = s.record[type_index]
-        types.add(name)
+    road_types_set = set()
+    for record in shape_records:
+        road_types_set.add(record.record[type_index])
     print("All road types :-")
-    for t in types:
-        if args.types is None:
-            selected = True
-        else:
-            selected = t in args.types
-        print(('{0} {1}'.format('*' if selected else '-', t)))
+    for road_type in road_types_set:
+        selected = True if args.types is None else (road_type in args.types)
+        print(f"{('*' if selected else '-')} {road_type}")  # Fixed: using f-string
     print("You can specify the road types with -t. (* is selected)")
 
-    lng, lat = sr[0].shape.points[0]
-    a, b, zone_x, zone_y = utm.from_latlon(lat, lng)
-    utm_zone = "{0:d}{1!s}".format(zone_x, zone_y)
+    # Determine UTM zone for coordinate transformation
+    lng, lat = shape_records[0].shape.points[0]
+    _, _, zone_x, zone_y = utm.from_latlon(lat, lng)
+    utm_zone = f"{zone_x:d}{zone_y}"  # Fixed: using f-string
 
-    wgs2utm = partial(pyproj.transform, pyproj.Proj("+init=EPSG:4326"),
-                      pyproj.Proj("+proj=utm +zone={0!s}".format(utm_zone)))
-    utm2wgs = partial(pyproj.transform, pyproj.Proj("+proj=utm +zone={0!s}".format(
-                      utm_zone)), pyproj.Proj("+init=EPSG:4326"))
+    wgs_to_utm = partial(
+        pyproj.transform,
+        pyproj.Proj(init="EPSG:4326"),
+        pyproj.Proj(f"+proj=utm +zone={utm_zone}")  # Fixed: using f-string
+    )
+    utm_to_wgs = partial(
+        pyproj.transform,
+        pyproj.Proj(f"+proj=utm +zone={utm_zone}"),  # Fixed: using f-string
+        pyproj.Proj(init="EPSG:4326")
+    )
 
     uid = 0
-    road_types = args.types
+    selected_road_types = args.types
 
     if args.plot:
-        # Delay import
-        try:
-            from matplotlib import colors
-            import matplotlib.pyplot as plt
-
-            cvalues = list(colors.cnames.values())
-            road_colors = road_types if road_types else []
-            fig, ax = plt.subplots(figsize=[14, 10])
-            first = []
-        except ImportError as e:
-            print("WARNING matplotlib is not installed")
+        if not MATPLOTLIB_AVAILABLE:
+            print("WARNING: matplotlib is not installed")
             args.plot = False
+        else:
+            c_values = list(colors.cnames.values())
+            road_colors = selected_road_types if selected_road_types else []
+            fig, axis = plt.subplots(figsize=(14, 10))
+            first = []
 
-    f = open(args.output, 'wb')
-    cols = ['segment_id', 'osm_id', 'osm_name', 'osm_type', 'start_lat',
-            'start_long', 'end_lat', 'end_long']
-    writer = csv.DictWriter(f, fieldnames=cols)
-    if not args.noheader:
-        writer.writeheader()
+    with open(args.output, "w", newline="", encoding="utf-8") as output_file:
+        cols = [
+            "segment_id", "osm_id", "osm_name", "osm_type", "start_lat",
+            "start_long", "end_lat", "end_long"
+        ]
+        writer = csv.DictWriter(output_file, fieldnames=cols)
+        if not args.noheader:
+            writer.writeheader()
 
-    for s in sr:
-        r = s.record
-        t = r[type_index]
-        if road_types is None or t in road_types:
-            p = s.shape.points
-            line = LineString(p)
-            new_line = transform(wgs2utm, line)
-            segments = redistribute_vertices(new_line, args.distance)
-            osm_id = r[0]
-            osm_name = r[1].strip()
-            osm_ref = r[2].strip()
-            osm_type = r[3].strip()
-            #check_length(segments)
-            new_segments = transform(utm2wgs, segments)
-            uid = output_to_file(writer, uid, osm_id, osm_name, osm_type,
-                                 new_segments)
-            if args.plot:
-                #p = line.coords
-                p = new_segments.coords
-                x = [i[0] for i in p[:]]
-                y = [i[1] for i in p[:]]
-                if t not in road_colors:
-                    road_colors.append(t)
-                c = cvalues[road_colors.index(t) % len(cvalues)]
-                if t not in first:
-                    first.append(t)
-                    ax.plot(x, y, color=c, label=t)
-                else:
-                    ax.plot(x, y, color=c)
-    f.close()
+        for record in shape_records:
+            rec = record.record
+            road_type_value = rec[type_index]
+            if selected_road_types is None or road_type_value in selected_road_types:
+                points = record.shape.points
+                line = LineString(points)
+                new_line = transform(wgs_to_utm, line)
+                segments_line = redistribute_vertices(new_line, args.distance)
+                osm_id = rec[0]
+                osm_name = rec[1].strip() if rec[1] else ""
+                osm_type = rec[3].strip() if rec[3] else ""
+                new_segments = transform(utm_to_wgs, segments_line)
+                uid = output_to_file(
+                    writer, uid, osm_id, osm_name, osm_type, new_segments
+                )
+                if args.plot and MATPLOTLIB_AVAILABLE:
+                    p_coords = new_segments.coords
+                    x_coords = [pt[0] for pt in p_coords]
+                    y_coords = [pt[1] for pt in p_coords]
+                    if road_type_value not in road_colors:
+                        road_colors.append(road_type_value)
+                    color_val = c_values[road_colors.index(road_type_value) %
+                                           len(c_values)]
+                    if road_type_value not in first:
+                        first.append(road_type_value)
+                        axis.plot(x_coords, y_coords, color=color_val,
+                                  label=road_type_value)
+                    else:
+                        axis.plot(x_coords, y_coords, color=color_val)
 
-    if args.plot:
-        plt.legend(loc='best', fancybox=True, framealpha=0.5)
-        plt.title('{0}, {1}'.format(args.name, args.country))
-        ax.get_yaxis().get_major_formatter().set_useOffset(False)
-        ax.get_yaxis().get_major_formatter().set_scientific(False)
-        ax.get_xaxis().get_major_formatter().set_useOffset(False)
-        ax.get_xaxis().get_major_formatter().set_scientific(False)
+    if args.plot and MATPLOTLIB_AVAILABLE:
+        axis.get_yaxis().get_major_formatter().set_useOffset(False)
+        axis.get_yaxis().get_major_formatter().set_scientific(False)
+        axis.get_xaxis().get_major_formatter().set_useOffset(False)
+        axis.get_xaxis().get_major_formatter().set_scientific(False)
+        plt.legend(loc="best", fancybox=True, framealpha=0.5)
+        plt.title(f"{args.name}, {args.country}")  # Fixed: using f-string
         plt.show()
 
     print("Done")
@@ -427,3 +552,4 @@ def main(argv=sys.argv[1:]):
 
 if __name__ == "__main__":
     sys.exit(main())
+
