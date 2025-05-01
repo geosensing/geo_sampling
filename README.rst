@@ -1,6 +1,9 @@
 Geo sampling: Randomly sample locations on streets
 ===================================================
 
+
+.. image:: https://notarypy.soodoku.workers.dev/badge/geo_sampling/0.1.2/geo_sampling-0.1.2-py3-none-any.whl
+    :target: https://pypi.org/integrity/geo_sampling/0.1.2/geo_sampling-0.1.2-py3-none-any.whl/provenance
 .. image:: https://img.shields.io/pypi/v/geo_sampling.svg?maxAge=3600
     :target: https://pypi.python.org/pypi/geo_sampling
 .. image:: https://readthedocs.org/projects/geo-sampling/badge/?version=latest
