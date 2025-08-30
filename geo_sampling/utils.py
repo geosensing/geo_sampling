@@ -1,7 +1,8 @@
 """
 Utility functions for the geo_sampling package.
 
-This module provides functions for plotting road segments and writing CSV files.
+This module provides functions for plotting road segments and writing CSV
+files.
 """
 
 import csv
@@ -14,7 +15,8 @@ def plot_road_segments(segments, title="Road Segments Plot"):
     Plot multiple road segments with different colors based on road type.
 
     Args:
-        segments (list of dict): List of road segment dictionaries. Each dictionary
+        segments (list of dict): List of road segment dictionaries. Each
+        dictionary
             should contain:
                 - 'start_lat' (float): Latitude of the starting point.
                 - 'start_long' (float): Longitude of the starting point.
@@ -36,7 +38,9 @@ def plot_road_segments(segments, title="Road Segments Plot"):
         road_type = segment["osm_type"]
 
         if road_type not in road_color_map:
-            road_color_map[road_type] = color_values[len(road_color_map) % len(color_values)]
+            road_color_map[road_type] = color_values[
+                len(road_color_map) % len(color_values)
+            ]
 
         # Get current legend labels
         _, current_labels = axis.get_legend_handles_labels()
@@ -68,7 +72,7 @@ def write_csv(file_path, data, no_header=False):
         None.
     """
     columns = [
-        "segment_id", "osm_id", "osm_name", "osm_type", 
+        "segment_id", "osm_id", "osm_name", "osm_type",
         "start_lat", "start_long", "end_lat", "end_long"
     ]
     with open(file_path, "w", newline="", encoding="utf-8") as out_file:

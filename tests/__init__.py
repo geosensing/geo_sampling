@@ -9,6 +9,7 @@ import sys
 from contextlib import contextmanager
 from io import StringIO
 
+
 @contextmanager
 def capture(command, *args, **kwargs):
     out, sys.stdout = sys.stdout, StringIO()

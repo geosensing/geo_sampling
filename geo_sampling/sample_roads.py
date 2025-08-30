@@ -64,7 +64,10 @@ def main(argv=None):
 
     total_segments = len(segments)
     if total_segments < args.samples:
-        print(f"Sample larger than population ({args.samples} > {total_segments})")
+        print(
+            f"Sample larger than population "
+            f"({args.samples} > {total_segments})"
+        )
         sys.exit(-1)
 
     # Randomly sample segments
