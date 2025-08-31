@@ -28,8 +28,8 @@ LANGUAGE = None
 
 EXCLUDE_PATTERNS = ["_build", "Thumbs.db", ".DS_Store"]
 
-pygments_style = "sphinx"
-todo_include_todos = False
+PYGMENTS_STYLE = "sphinx"
+TODO_INCLUDE_TODOS = False
 
 # -- Options for HTML output ----------------------------------------------
 

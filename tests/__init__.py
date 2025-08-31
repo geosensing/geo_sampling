@@ -12,6 +12,7 @@ from io import StringIO
 
 @contextmanager
 def capture(command, *args, **kwargs):
+    """Context manager to capture stdout from a command execution."""
     out, sys.stdout = sys.stdout, StringIO()
     command(*args, **kwargs)
     sys.stdout.seek(0)

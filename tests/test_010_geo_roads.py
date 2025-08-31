@@ -19,6 +19,7 @@ ADM_LEVEL = os.environ.get('ADM_LEVEL', '1')
 
 @unittest.skipIf(COUNTRY_NAME is None, 'No COUNTRY_NAME found in environment.')
 class TestGeoRoads(unittest.TestCase):
+    """Test cases for geo_roads module functionality."""
 
     def setUp(self):
         pass
@@ -27,6 +28,7 @@ class TestGeoRoads(unittest.TestCase):
         shutil.rmtree('data')
 
     def test_geo_roads(self):
+        """Test the main geo_roads processing function."""
         with capture(main, ['-l', ADM_LEVEL, '-c', COUNTRY_NAME, '-n',
                             REGION_NAME]) as output:
             self.assertRegex(output, r'Done$')

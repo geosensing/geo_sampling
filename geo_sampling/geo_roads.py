@@ -377,7 +377,7 @@ def bbbike_generate_extract_link(args):
         tuple: (city, URL) if successful; otherwise (None, None).
     """
     # Load boundary data and region names
-    shape_records, names_idx, nl_names_idx, names = _load_boundary_data(args)
+    shape_records, names_idx, _, names = _load_boundary_data(args)
     if shape_records is None:
         return None, None
 
