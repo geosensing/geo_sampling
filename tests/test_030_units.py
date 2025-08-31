@@ -5,9 +5,15 @@
 Unit tests for individual functions in geo_sampling.
 """
 
+import csv
+import os
+import tempfile
 import unittest
+from io import StringIO
 from unittest.mock import patch
+
 from shapely.geometry import LineString
+from shapely.geometry import Point
 
 from geo_sampling.geo_roads import (
     redistribute_vertices,
@@ -15,6 +21,7 @@ from geo_sampling.geo_roads import (
     _setup_data_directory
 )
 from geo_sampling.utils import write_csv
+from .test_utils import TestDataMixin
 
 
 class TestRedistributeVertices(unittest.TestCase):
@@ -45,7 +52,6 @@ class TestRedistributeVertices(unittest.TestCase):
 
     def test_invalid_geometry(self):
         """Test handling of invalid geometry types."""
-        from shapely.geometry import Point
         point = Point(0, 0)
 
         with self.assertRaises(ValueError):
@@ -57,9 +63,6 @@ class TestOutputToFile(unittest.TestCase):
 
     def test_output_segments(self):
         """Test writing segments to CSV."""
-        import csv
-        from io import StringIO
-
         # Create mock writer
         output = StringIO()
         writer = csv.DictWriter(output, fieldnames=[
@@ -77,31 +80,17 @@ class TestOutputToFile(unittest.TestCase):
         self.assertEqual(uid, 2)  # Two segments written
 
 
-class TestUtils(unittest.TestCase):
+class TestUtils(TestDataMixin, unittest.TestCase):
     """Test utility functions."""
 
     def test_write_csv(self):
         """Test CSV writing functionality."""
-        import tempfile
-        import os
-
-        test_data = [
-            {
-                "segment_id": 1,
-                "osm_id": "123",
-                "osm_name": "Test Road",
-                "osm_type": "primary",
-                "start_lat": 0.0,
-                "start_long": 0.0,
-                "end_lat": 1.0,
-                "end_long": 1.0
-            }
-        ]
+        test_data = [self.sample_test_data[0]]  # Use first item from shared data
 
         with tempfile.NamedTemporaryFile(
             mode='w', delete=False, suffix='.csv'
-        ) as f:
-            temp_path = f.name
+        ) as temp_csv:
+            temp_path = temp_csv.name
 
         try:
             write_csv(temp_path, test_data)
@@ -109,35 +98,32 @@ class TestUtils(unittest.TestCase):
             # Verify file was created and contains data
             self.assertTrue(os.path.exists(temp_path))
 
-            with open(temp_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+            with open(temp_path, 'r', encoding='utf-8') as csv_file:
+                content = csv_file.read()
                 self.assertIn("segment_id", content)
-                self.assertIn("Test Road", content)
+                self.assertIn("Test Road 1", content)
 
         finally:
-            os.unlink(temp_path)
+            self.cleanup_temp_file(temp_path)
 
     def test_write_csv_no_header(self):
         """Test CSV writing without header."""
-        import tempfile
-        import os
-
         test_data = [{"segment_id": 1, "osm_id": "123"}]
 
         with tempfile.NamedTemporaryFile(
             mode='w', delete=False, suffix='.csv'
-        ) as f:
-            temp_path = f.name
+        ) as temp_csv:
+            temp_path = temp_csv.name
 
         try:
             write_csv(temp_path, test_data, no_header=True)
 
-            with open(temp_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+            with open(temp_path, 'r', encoding='utf-8') as csv_file:
+                content = csv_file.read()
                 self.assertNotIn("segment_id", content)  # No header
 
         finally:
-            os.unlink(temp_path)
+            self.cleanup_temp_file(temp_path)
 
 
 class TestHelperFunctions(unittest.TestCase):
