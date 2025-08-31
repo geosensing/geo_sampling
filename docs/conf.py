@@ -21,8 +21,8 @@ PROJECT = "Geo sampling"
 COPYRIGHT_INFO = "2016--2025, Suriyan Laohaprapanon, Gaurav Sood"
 AUTHOR = "Suriyan Laohaprapanon, Gaurav Sood"
 
-VERSION = "0.2.0"
-RELEASE = "0.2.0"
+VERSION = "0.2.1"
+RELEASE = "0.2.1"
 
 LANGUAGE = None
 
