@@ -1,5 +1,5 @@
 [MESSAGES CONTROL]
-disable = import-error
+disable = import-error,R0917
 
 [DESIGN]
 max-args = 7
