@@ -413,7 +413,7 @@ def bbbike_submit_extract_link(args):
     Returns:
         bool: True if submission is successful, False otherwise.
     """
-    response = requests.get(args.bbbike_url + "&submit=1")
+    response = requests.get(args.bbbike_url + "&submit=1", timeout=30)
     if response.status_code == 200:
         print("Extract link submitted")
         return True
@@ -434,7 +434,8 @@ def bbbike_check_download_link(args):
     while wait_time < BBBIKE_MAX_WAIT:
         try:
             response = requests.get(
-                "https://download.bbbike.org/osm/extract/?date=all"
+                "https://download.bbbike.org/osm/extract/?date=all",
+                timeout=30
             )
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, "html.parser")

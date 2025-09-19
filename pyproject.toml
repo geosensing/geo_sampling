@@ -36,7 +36,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["check-manifest"]
-test = ["coverage"]
+test = ["coverage", "pytest"]
+docs = ["sphinx>=4.0", "sphinx_rtd_theme", "tomli>=1.2.0;python_version<'3.11'"]
 
 [project.urls]
 Homepage = "https://github.com/geosensing/geo_sampling"
