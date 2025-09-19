@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "geo-sampling"
-version = "0.2.1"
+version = "0.2.2"
 description = "Scripts for sampling Geo data sets by the specific region name"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [

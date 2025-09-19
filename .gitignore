@@ -2,10 +2,28 @@
 !.gitattributes
 !.travis.yml
 !.pep8speaks.yml
+
+# Python cache and compiled files
 *.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Documentation builds
+docs/_build/
+
+# Test artifacts
+.pytest_cache/
+output*.csv
 *.log
-output.csv
-data
+
+# Development data
+data/
+
+# OS files
 .DS_Store
-/dist
-/geo_sampling.egg-info
