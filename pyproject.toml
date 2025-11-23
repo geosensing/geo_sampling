@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.21.1"]
+build-backend = "hatchling.build"
 
 [project]
 name = "geo-sampling"
 version = "0.2.2"
 description = "Scripts for sampling Geo data sets by the specific region name"
 readme = "README.md"
-requires-python = ">=3.10"
-license = "MIT"
+requires-python = ">=3.11"
+license = {text = "MIT"}
 authors = [
     {name = "Suriyan Laohaprapanon", email = "suriyant@gmail.com"},
     {name = "Gaurav Sood", email = "gsood07@gmail.com"}
@@ -47,5 +47,9 @@ Repository = "https://github.com/geosensing/geo_sampling"
 geo_roads = "geo_sampling.geo_roads:main"
 sample_roads = "geo_sampling.sample_roads:main"
 
-[tool.setuptools]
-packages = {find = {exclude = ["contrib", "docs", "tests", "script"]}}
+[tool.hatch.build.targets.wheel]
+packages = ["geo_sampling"]
+
+[dependency-groups]
+dev = ["pytest>=7.0", "pytest-cov>=4.0", "ruff>=0.7.0", "mypy>=1.0"]
+test = ["pytest>=7.0", "pytest-cov>=4.0"]
