@@ -26,8 +26,9 @@ python -m unittest discover tests  # Alternative way to run all tests
 
 ### Linting and Code Quality
 ```bash
-flake8 .                  # Style checking (used in CI)
-pylint $(git ls-files '*.py')  # Static analysis (used in CI)
+uv run ruff check .       # Linting (used in CI)
+uv run ruff format .      # Code formatting
+uv run ruff format --check .  # Check formatting (used in CI)
 ```
 
 ### Package Building
@@ -67,7 +68,7 @@ Environment variables for testing:
 - BBBike.org extract URLs are dynamically generated via web scraping
 - Road segments are split into 500m chunks for consistent sampling density
 - Geographic transformations use UTM coordinate system for distance calculations
-- CI runs on Python 3.11 with flake8 and pylint for code quality
+- CI runs on Python 3.11+ with ruff for code quality and formatting
 
 ## Dependencies
 

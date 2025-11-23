@@ -381,7 +381,7 @@ def bbbike_generate_extract_link(args):
         for name in names:
             try:
                 print(f"- {name}")
-            except Exception:  # pylint: disable=broad-except
+            except Exception:  # noqa: BLE001
                 print(f"- {name}")
         return None, None
 
