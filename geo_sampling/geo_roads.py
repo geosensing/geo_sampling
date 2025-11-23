@@ -39,9 +39,7 @@ from shapely.ops import transform, unary_union
 
 
 # Constants
-GADM_SHP_URL_FMT = (
-    "https://geodata.ucdavis.edu/gadm/gadm4.1/shp/gadm41_{0}_shp.zip"
-)
+GADM_SHP_URL_FMT = "https://geodata.ucdavis.edu/gadm/gadm4.1/shp/gadm41_{0}_shp.zip"
 BBBIKE_MAX_POINTS = 300
 BBBIKE_MAX_WAIT = 50
 
@@ -86,16 +84,18 @@ def output_to_file(writer, uid, osm_id, osm_name, osm_type, line_obj):
         else:
             start_long, start_lat = tuple(previous)
             end_long, end_lat = tuple(point)
-            writer.writerow({
-                "segment_id": uid,
-                "osm_id": osm_id,
-                "osm_name": osm_name,
-                "osm_type": osm_type,
-                "start_lat": start_lat,
-                "start_long": start_long,
-                "end_lat": end_lat,
-                "end_long": end_long,
-            })
+            writer.writerow(
+                {
+                    "segment_id": uid,
+                    "osm_id": osm_id,
+                    "osm_name": osm_name,
+                    "osm_type": osm_type,
+                    "start_lat": start_lat,
+                    "start_long": start_long,
+                    "end_lat": end_lat,
+                    "end_long": end_long,
+                }
+            )
             uid += 1
             previous = point
     return uid
@@ -113,9 +113,7 @@ def gadm_get_country_list():
         ValueError: If no countries are found in the response.
     """
     try:
-        resp = requests.get(
-            "https://gadm.org/download_country.html", timeout=30
-        )
+        resp = requests.get("https://gadm.org/download_country.html", timeout=30)
         resp.raise_for_status()
         countries = {}
 
@@ -174,7 +172,7 @@ def gadm_download_country_data(ccode):
         str: Local filename of downloaded data.
     """
     url = GADM_SHP_URL_FMT.format(ccode)
-    local_filename = os.path.join("data", url.rsplit('/', maxsplit=1)[-1])
+    local_filename = os.path.join("data", url.rsplit("/", maxsplit=1)[-1])
     download_url(url, local_filename)
     return local_filename
 
@@ -267,9 +265,7 @@ def _load_boundary_data(args):
                 for rec_obj in shape_records:
                     name_val = "+".join([rec_obj.record[i] for i in names_idx])
                     names.append(name_val)
-                    nl_name_val = "+".join(
-                        [rec_obj.record[i] for i in nl_names_idx]
-                    )
+                    nl_name_val = "+".join([rec_obj.record[i] for i in nl_names_idx])
                     nl_names.append(nl_name_val)
 
     return shape_records, names_idx, nl_names_idx, names
@@ -308,9 +304,7 @@ def _process_boundary_polygon(rec_obj):
     extra_polygons = []
     for poly in polygon_list:
         if poly != max_polygon:
-            connecting_line = LineString(
-                [poly.centroid, max_polygon.centroid]
-            )
+            connecting_line = LineString([poly.centroid, max_polygon.centroid])
             extra_polygons.append(connecting_line.buffer(0.00001))
     polygon_list.extend(extra_polygons)
 
@@ -434,8 +428,7 @@ def bbbike_check_download_link(args):
     while wait_time < BBBIKE_MAX_WAIT:
         try:
             response = requests.get(
-                "https://download.bbbike.org/osm/extract/?date=all",
-                timeout=30
+                "https://download.bbbike.org/osm/extract/?date=all", timeout=30
             )
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, "html.parser")
@@ -503,15 +496,13 @@ def _download_boundary_data(args):
             extracted_files = []
             for file in zip_file.namelist():
                 for level in range(1, args.level + 1):
-                    pattern = fr".*_{args.ccode}_{level}\.(:?dbf|shp)"
+                    pattern = rf".*_{args.ccode}_{level}\.(:?dbf|shp)"
                     if re.match(pattern, file):
                         zip_file.extract(file, "data")
                         extracted_files.append(file)
 
             if not extracted_files:
-                raise ValueError(
-                    f"No boundary files found for level {args.level}"
-                )
+                raise ValueError(f"No boundary files found for level {args.level}")
 
     except (zipfile.BadZipFile, ValueError) as e:
         print(f"Failed to extract boundary data: {e}")
@@ -562,14 +553,14 @@ def _extract_road_files(args, osm_shape_filename):
     """Extract road shapefiles from OSM data."""
     print("Extract OSM data file (Roads shapefile)...")
     try:
-        with zipfile.ZipFile(osm_shape_filename, 'r') as zip_file:
+        with zipfile.ZipFile(osm_shape_filename, "r") as zip_file:
             extracted_files = []
             for file in zip_file.namelist():
                 file_name = os.path.basename(file)
-                if re.match('roads.(:?dbf|shp)', file_name):
+                if re.match("roads.(:?dbf|shp)", file_name):
                     source = zip_file.open(file)
                     target_path = os.path.join(
-                        'data', f"{args.ccode}_{args.name}_{file_name}"
+                        "data", f"{args.ccode}_{args.name}_{file_name}"
                     )
                     with source, open(target_path, "wb") as target:
                         shutil.copyfileobj(source, target)
@@ -594,8 +585,7 @@ def _process_roads_and_output(args):
         sys.exit(-1)
 
     try:
-        with open(shp_path, "rb") as shp_file, \
-             open(dbf_path, "rb") as dbf_file:
+        with open(shp_path, "rb") as shp_file, open(dbf_path, "rb") as dbf_file:
             reader = shapefile.Reader(shp=shp_file, dbf=dbf_file)
             shape_records = reader.shapeRecords()
 
@@ -614,9 +604,7 @@ def _process_roads_and_output(args):
 
     print("All road types :-")
     for road_type in road_types_set:
-        selected = (
-            True if args.types is None else (road_type in args.types)
-        )
+        selected = True if args.types is None else (road_type in args.types)
         print(f"{('*' if selected else '-')} {road_type}")
     print("You can specify the road types with -t. (* is selected)")
 
@@ -648,8 +636,14 @@ def _process_roads_and_output(args):
     # Process roads and write output
     with open(args.output, "w", newline="", encoding="utf-8") as output_file:
         cols = [
-            "segment_id", "osm_id", "osm_name", "osm_type", "start_lat",
-            "start_long", "end_lat", "end_long"
+            "segment_id",
+            "osm_id",
+            "osm_name",
+            "osm_type",
+            "start_lat",
+            "start_long",
+            "end_lat",
+            "end_long",
         ]
         writer = csv.DictWriter(output_file, fieldnames=cols)
         if not args.noheader:
@@ -658,10 +652,7 @@ def _process_roads_and_output(args):
         for record in shape_records:
             rec = record.record
             road_type_value = rec[type_index]
-            if (
-                selected_road_types is None or
-                road_type_value in selected_road_types
-            ):
+            if selected_road_types is None or road_type_value in selected_road_types:
                 points = record.shape.points
                 line = LineString(points)
                 new_line = transform(wgs_to_utm, line)
@@ -679,14 +670,13 @@ def _process_roads_and_output(args):
                     y_coords = [pt[1] for pt in p_coords]
                     if road_type_value not in road_colors:
                         road_colors.append(road_type_value)
-                    color_idx = (
-                        road_colors.index(road_type_value) % len(c_values)
-                    )
+                    color_idx = road_colors.index(road_type_value) % len(c_values)
                     color_val = c_values[color_idx]
                     if road_type_value not in first:
                         first.append(road_type_value)
-                        axis.plot(x_coords, y_coords, color=color_val,
-                                  label=road_type_value)
+                        axis.plot(
+                            x_coords, y_coords, color=color_val, label=road_type_value
+                        )
                     else:
                         axis.plot(x_coords, y_coords, color=color_val)
 
@@ -716,37 +706,46 @@ def main(argv=None):
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser(description="Geo roads data")
     parser.add_argument(
-        "-c", "--country", dest="country", default=None,
-        help="Select country"
+        "-c", "--country", dest="country", default=None, help="Select country"
     )
     parser.add_argument(
-        "-l", "--level", dest="level", default=1, type=int,
-        choices=list(range(1, 5)), help="Select administrative level"
+        "-l",
+        "--level",
+        dest="level",
+        default=1,
+        type=int,
+        choices=list(range(1, 5)),
+        help="Select administrative level",
     )
     parser.add_argument(
-        "-n", "--name", dest="name", default=None,
-        help="Select region name"
+        "-n", "--name", dest="name", default=None, help="Select region name"
     )
     parser.add_argument(
-        "-t", "--types", nargs="+", dest="types", default=None,
-        help="Select road types (list)"
+        "-t",
+        "--types",
+        nargs="+",
+        dest="types",
+        default=None,
+        help="Select road types (list)",
+    )
+    parser.add_argument("-o", "--output", default="output.csv", help="Output file name")
+    parser.add_argument(
+        "-d",
+        "--distance",
+        dest="distance",
+        type=int,
+        default=500,
+        help="Distance in meters to split",
     )
     parser.add_argument(
-        "-o", "--output", default="output.csv",
-        help="Output file name"
-    )
-    parser.add_argument(
-        "-d", "--distance", dest="distance", type=int, default=500,
-        help="Distance in meters to split"
-    )
-    parser.add_argument(
-        "--no-header", dest="noheader", action="store_true",
-        help="Output without the header"
+        "--no-header",
+        dest="noheader",
+        action="store_true",
+        help="Output without the header",
     )
     parser.set_defaults(noheader=False)
     parser.add_argument(
-        "--plot", dest="plot", action="store_true",
-        help="Plot the output"
+        "--plot", dest="plot", action="store_true", help="Plot the output"
     )
     parser.set_defaults(plot=False)
 

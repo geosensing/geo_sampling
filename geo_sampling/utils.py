@@ -45,8 +45,13 @@ def plot_road_segments(segments, title="Road Segments Plot"):
         # Get current legend labels
         _, current_labels = axis.get_legend_handles_labels()
         label = road_type if road_type not in current_labels else ""
-        axis.plot(x_coords, y_coords, color=road_color_map[road_type],
-                  linewidth=1.2, label=label)
+        axis.plot(
+            x_coords,
+            y_coords,
+            color=road_color_map[road_type],
+            linewidth=1.2,
+            label=label,
+        )
 
     # Format the axes for better display
     axis.get_yaxis().get_major_formatter().set_useOffset(False)
@@ -72,8 +77,14 @@ def write_csv(file_path, data, no_header=False):
         None.
     """
     columns = [
-        "segment_id", "osm_id", "osm_name", "osm_type",
-        "start_lat", "start_long", "end_lat", "end_long"
+        "segment_id",
+        "osm_id",
+        "osm_name",
+        "osm_type",
+        "start_lat",
+        "start_long",
+        "end_lat",
+        "end_long",
     ]
     with open(file_path, "w", newline="", encoding="utf-8") as out_file:
         writer = csv.DictWriter(out_file, fieldnames=columns)

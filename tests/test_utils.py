@@ -25,7 +25,7 @@ class TestDataMixin:
                 "start_lat": 0.0,
                 "start_long": 0.0,
                 "end_lat": 1.0,
-                "end_long": 1.0
+                "end_long": 1.0,
             },
             {
                 "segment_id": 2,
@@ -35,8 +35,8 @@ class TestDataMixin:
                 "start_lat": 1.0,
                 "start_long": 1.0,
                 "end_lat": 2.0,
-                "end_long": 2.0
-            }
+                "end_long": 2.0,
+            },
         ]
 
     def create_test_csv(self, data=None):
@@ -44,15 +44,22 @@ class TestDataMixin:
         if data is None:
             data = self.sample_test_data
 
-        temp_file = tempfile.NamedTemporaryFile(
-            mode='w', delete=False, suffix='.csv'
-        )
+        temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".csv")
 
         with temp_file as temp_csv:
-            writer = csv.DictWriter(temp_csv, fieldnames=[
-                "segment_id", "osm_id", "osm_name", "osm_type",
-                "start_lat", "start_long", "end_lat", "end_long"
-            ])
+            writer = csv.DictWriter(
+                temp_csv,
+                fieldnames=[
+                    "segment_id",
+                    "osm_id",
+                    "osm_name",
+                    "osm_type",
+                    "start_lat",
+                    "start_long",
+                    "end_lat",
+                    "end_long",
+                ],
+            )
             writer.writeheader()
             writer.writerows(data)
 

@@ -8,6 +8,7 @@ project.
 """
 
 from pathlib import Path
+
 try:
     import tomllib
 except ImportError:
@@ -64,20 +65,29 @@ latex_elements = {
 }
 
 latex_documents = [
-    (MASTER_DOC, "Geosampling.tex", "Geo sampling Documentation",
-     COPYRIGHT_INFO, "manual"),
+    (
+        MASTER_DOC,
+        "Geosampling.tex",
+        "Geo sampling Documentation",
+        COPYRIGHT_INFO,
+        "manual",
+    ),
 ]
 
 # -- Options for manual page output ---------------------------------------
 
-man_pages = [
-    (MASTER_DOC, "geosampling", "Geo sampling Documentation",
-     [AUTHOR], 1)
-]
+man_pages = [(MASTER_DOC, "geosampling", "Geo sampling Documentation", [AUTHOR], 1)]
 
 # -- Options for Texinfo output -------------------------------------------
 
 texinfo_documents = [
-    (MASTER_DOC, "Geosampling", "Geo sampling Documentation", AUTHOR,
-     "Geosampling", "One line description of project.", "Miscellaneous"),
+    (
+        MASTER_DOC,
+        "Geosampling",
+        "Geo sampling Documentation",
+        AUTHOR,
+        "Geosampling",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
 ]

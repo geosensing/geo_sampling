@@ -23,9 +23,9 @@ class TestSampleRoads(unittest.TestCase):
 
     def test_sample(self):
         """Test the sampling functionality."""
-        main(['-n', '100', 'output.csv'])
-        self.assertTrue(os.path.exists('sample-output.csv'))
+        main(["-n", "100", "output.csv"])
+        self.assertTrue(os.path.exists("sample-output.csv"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

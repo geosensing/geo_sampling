@@ -18,7 +18,7 @@ from shapely.geometry import Point
 from geo_sampling.geo_roads import (
     redistribute_vertices,
     output_to_file,
-    _setup_data_directory
+    _setup_data_directory,
 )
 from geo_sampling.utils import write_csv
 from .test_utils import TestDataMixin
@@ -65,10 +65,19 @@ class TestOutputToFile(unittest.TestCase):
         """Test writing segments to CSV."""
         # Create mock writer
         output = StringIO()
-        writer = csv.DictWriter(output, fieldnames=[
-            "segment_id", "osm_id", "osm_name", "osm_type",
-            "start_lat", "start_long", "end_lat", "end_long"
-        ])
+        writer = csv.DictWriter(
+            output,
+            fieldnames=[
+                "segment_id",
+                "osm_id",
+                "osm_name",
+                "osm_type",
+                "start_lat",
+                "start_long",
+                "end_lat",
+                "end_long",
+            ],
+        )
 
         # Create test line
         line = LineString([(0, 0), (1, 1), (2, 2)])
@@ -88,7 +97,7 @@ class TestUtils(TestDataMixin, unittest.TestCase):
         test_data = [self.sample_test_data[0]]  # Use first item from shared data
 
         with tempfile.NamedTemporaryFile(
-            mode='w', delete=False, suffix='.csv'
+            mode="w", delete=False, suffix=".csv"
         ) as temp_csv:
             temp_path = temp_csv.name
 
@@ -98,7 +107,7 @@ class TestUtils(TestDataMixin, unittest.TestCase):
             # Verify file was created and contains data
             self.assertTrue(os.path.exists(temp_path))
 
-            with open(temp_path, 'r', encoding='utf-8') as csv_file:
+            with open(temp_path, "r", encoding="utf-8") as csv_file:
                 content = csv_file.read()
                 self.assertIn("segment_id", content)
                 self.assertIn("Test Road 1", content)
@@ -111,14 +120,14 @@ class TestUtils(TestDataMixin, unittest.TestCase):
         test_data = [{"segment_id": 1, "osm_id": "123"}]
 
         with tempfile.NamedTemporaryFile(
-            mode='w', delete=False, suffix='.csv'
+            mode="w", delete=False, suffix=".csv"
         ) as temp_csv:
             temp_path = temp_csv.name
 
         try:
             write_csv(temp_path, test_data, no_header=True)
 
-            with open(temp_path, 'r', encoding='utf-8') as csv_file:
+            with open(temp_path, "r", encoding="utf-8") as csv_file:
                 content = csv_file.read()
                 self.assertNotIn("segment_id", content)  # No header
 
@@ -129,8 +138,8 @@ class TestUtils(TestDataMixin, unittest.TestCase):
 class TestHelperFunctions(unittest.TestCase):
     """Test helper functions."""
 
-    @patch('os.path.exists')
-    @patch('os.makedirs')
+    @patch("os.path.exists")
+    @patch("os.makedirs")
     def test_setup_data_directory(self, mock_makedirs, mock_exists):
         """Test data directory setup."""
         mock_exists.return_value = False
@@ -140,8 +149,8 @@ class TestHelperFunctions(unittest.TestCase):
         mock_exists.assert_called_once_with("data")
         mock_makedirs.assert_called_once_with("data")
 
-    @patch('os.path.exists')
-    @patch('os.makedirs')
+    @patch("os.path.exists")
+    @patch("os.makedirs")
     def test_setup_data_directory_exists(self, mock_makedirs, mock_exists):
         """Test data directory setup when directory exists."""
         mock_exists.return_value = True
@@ -152,5 +161,5 @@ class TestHelperFunctions(unittest.TestCase):
         mock_makedirs.assert_not_called()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

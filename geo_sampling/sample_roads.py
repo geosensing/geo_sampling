@@ -16,35 +16,38 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
 
-    parser = argparse.ArgumentParser(
-        description="Randomly sample road segments"
+    parser = argparse.ArgumentParser(description="Randomly sample road segments")
+    parser.add_argument("input", help="Road segments input file")
+    parser.add_argument(
+        "-n",
+        "--n-samples",
+        dest="samples",
+        type=int,
+        default=0,
+        help="Number of random samples",
     )
     parser.add_argument(
-        "input", help="Road segments input file"
+        "-t",
+        "--types",
+        nargs="+",
+        dest="types",
+        default=None,
+        help="Select road types (list)",
     )
     parser.add_argument(
-        "-n", "--n-samples", dest="samples", type=int, default=0,
-        help="Number of random samples"
+        "-o", "--output", default="sample-output.csv", help="Sample output file name"
     )
     parser.add_argument(
-        "-t", "--types", nargs="+", dest="types", default=None,
-        help="Select road types (list)"
+        "--no-header",
+        dest="noheader",
+        action="store_true",
+        help="Output without the header",
     )
     parser.add_argument(
-        "-o", "--output", default="sample-output.csv",
-        help="Sample output file name"
+        "--plot", dest="plot", action="store_true", help="Plot the output"
     )
     parser.add_argument(
-        "--no-header", dest="noheader", action="store_true",
-        help="Output without the header"
-    )
-    parser.add_argument(
-        "--plot", dest="plot", action="store_true",
-        help="Plot the output"
-    )
-    parser.add_argument(
-        "-s", "--seed", dest="seed", type=int, default=0,
-        help="Random seed"
+        "-s", "--seed", dest="seed", type=int, default=0, help="Random seed"
     )
 
     args = parser.parse_args(argv)
@@ -64,17 +67,12 @@ def main(argv=None):
 
     total_segments = len(segments)
     if total_segments < args.samples:
-        print(
-            f"Sample larger than population "
-            f"({args.samples} > {total_segments})"
-        )
+        print(f"Sample larger than population ({args.samples} > {total_segments})")
         sys.exit(-1)
 
     # Randomly sample segments
     sample_segments = (
-        random.sample(segments, args.samples)
-        if args.samples > 0
-        else segments
+        random.sample(segments, args.samples) if args.samples > 0 else segments
     )
 
     # Write to CSV
@@ -84,10 +82,7 @@ def main(argv=None):
     if args.plot:
         plot_road_segments(
             sample_segments,
-            title=(
-                f"Road Segments Sample (N = {args.samples} of "
-                f"{total_segments})"
-            )
+            title=(f"Road Segments Sample (N = {args.samples} of {total_segments})"),
         )
 
     return 0

@@ -12,12 +12,12 @@ import unittest
 from geo_sampling.geo_roads import main
 from . import capture
 
-COUNTRY_NAME = os.environ.get('COUNTRY_NAME', 'Singapore')
-REGION_NAME = os.environ.get('REGION_NAME', 'North')
-ADM_LEVEL = os.environ.get('ADM_LEVEL', '1')
+COUNTRY_NAME = os.environ.get("COUNTRY_NAME", "Singapore")
+REGION_NAME = os.environ.get("REGION_NAME", "North")
+ADM_LEVEL = os.environ.get("ADM_LEVEL", "1")
 
 
-@unittest.skipIf(COUNTRY_NAME is None, 'No COUNTRY_NAME found in environment.')
+@unittest.skipIf(COUNTRY_NAME is None, "No COUNTRY_NAME found in environment.")
 class TestGeoRoads(unittest.TestCase):
     """Test cases for geo_roads module functionality."""
 
@@ -25,14 +25,15 @@ class TestGeoRoads(unittest.TestCase):
         pass
 
     def tearDown(self):
-        shutil.rmtree('data')
+        shutil.rmtree("data")
 
     def test_geo_roads(self):
         """Test the main geo_roads processing function."""
-        with capture(main, ['-l', ADM_LEVEL, '-c', COUNTRY_NAME, '-n',
-                            REGION_NAME]) as output:
-            self.assertRegex(output, r'Done$')
+        with capture(
+            main, ["-l", ADM_LEVEL, "-c", COUNTRY_NAME, "-n", REGION_NAME]
+        ) as output:
+            self.assertRegex(output, r"Done$")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
