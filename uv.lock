@@ -426,6 +426,10 @@ dev = [
     { name = "pytest-cov" },
     { name = "ruff" },
 ]
+docs = [
+    { name = "sphinx" },
+    { name = "sphinx-rtd-theme" },
+]
 test = [
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -455,6 +459,11 @@ dev = [
     { name = "pytest", specifier = ">=7.0" },
     { name = "pytest-cov", specifier = ">=4.0" },
     { name = "ruff", specifier = ">=0.7.0" },
+]
+docs = [
+    { name = "sphinx", specifier = ">=4.0" },
+    { name = "sphinx-rtd-theme" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=1.2.0" },
 ]
 test = [
     { name = "pytest", specifier = ">=7.0" },

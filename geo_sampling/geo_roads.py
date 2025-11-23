@@ -257,15 +257,25 @@ def _load_boundary_data(args):
                         nl_name_idx = idx
                     idx += 1
             if shape_records:
-                levels_engtype.append(shape_records[0].record[engtype_idx] if engtype_idx is not None else "")
-                levels_type.append(shape_records[0].record[type_idx] if type_idx is not None else "")
+                levels_engtype.append(
+                    shape_records[0].record[engtype_idx]
+                    if engtype_idx is not None
+                    else ""
+                )
+                levels_type.append(
+                    shape_records[0].record[type_idx] if type_idx is not None else ""
+                )
                 names_idx.append(name_idx)
                 nl_names_idx.append(nl_name_idx)
             if level == args.level:
                 for rec_obj in shape_records:
-                    name_val = "+".join([rec_obj.record[i] for i in names_idx])
+                    name_val = "+".join(
+                        [rec_obj.record[i] for i in names_idx if i is not None]
+                    )
                     names.append(name_val)
-                    nl_name_val = "+".join([rec_obj.record[i] for i in nl_names_idx])
+                    nl_name_val = "+".join(
+                        [rec_obj.record[i] for i in nl_names_idx if i is not None]
+                    )
                     nl_names.append(nl_name_val)
 
     return shape_records, names_idx, nl_names_idx, names
