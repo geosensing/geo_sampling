@@ -257,8 +257,8 @@ def _load_boundary_data(args):
                         nl_name_idx = idx
                     idx += 1
             if shape_records:
-                levels_engtype.append(shape_records[0].record[engtype_idx])
-                levels_type.append(shape_records[0].record[type_idx])
+                levels_engtype.append(shape_records[0].record[engtype_idx] if engtype_idx is not None else "")
+                levels_type.append(shape_records[0].record[type_idx] if type_idx is not None else "")
                 names_idx.append(name_idx)
                 nl_names_idx.append(nl_name_idx)
             if level == args.level:

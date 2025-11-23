@@ -40,7 +40,7 @@ pip install .             # Install package normally
 
 ### Documentation
 ```bash
-cd docs && make html      # Build Sphinx documentation
+cd docs && make html      # Build Sphinx documentation (uses uv run)
 cd docs && make clean     # Clean documentation build
 ```
 
