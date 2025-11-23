@@ -244,18 +244,31 @@ def _load_boundary_data(args):
             type_idx = None
             name_idx = None
             nl_name_idx = None
+            country_idx = None
 
             for field in reader.fields:
-                if isinstance(field, list):
-                    if field[0] == f"ENGTYPE_{level}":
-                        engtype_idx = idx
-                    if field[0] == f"TYPE_{level}":
-                        type_idx = idx
-                    if field[0] == f"NAME_{level}":
-                        name_idx = idx
-                    if field[0] == f"NL_NAME_{level}":
-                        nl_name_idx = idx
-                    idx += 1
+                field_name = (
+                    field.name
+                    if hasattr(field, "name")
+                    else (field[0] if isinstance(field, list) else str(field))
+                )
+                if field_name == f"ENGTYPE_{level}":
+                    engtype_idx = idx
+                if field_name == f"TYPE_{level}":
+                    type_idx = idx
+                if field_name == f"NAME_{level}":
+                    name_idx = idx
+                if field_name == f"NL_NAME_{level}":
+                    nl_name_idx = idx
+                if field_name == "COUNTRY":
+                    country_idx = idx
+                idx += 1
+
+            # Fallback to COUNTRY field if NAME_{level} is not available or empty
+            if name_idx is None or (
+                shape_records and shape_records[0].record[name_idx] in ["NA", "", None]
+            ):
+                name_idx = country_idx
             if shape_records:
                 levels_engtype.append(
                     shape_records[0].record[engtype_idx]

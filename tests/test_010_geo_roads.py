@@ -13,7 +13,7 @@ from geo_sampling.geo_roads import main
 from . import capture
 
 COUNTRY_NAME = os.environ.get("COUNTRY_NAME", "Singapore")
-REGION_NAME = os.environ.get("REGION_NAME", "North")
+REGION_NAME = os.environ.get("REGION_NAME", "Central")
 ADM_LEVEL = os.environ.get("ADM_LEVEL", "1")
 
 
