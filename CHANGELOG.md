@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Legacy CLI-based functionality
 - Basic road extraction and sampling capabilities
 
-## [0.2.0] - Previous release  
+## [0.2.0] - Previous release
 - Initial stable release with core functionality
 
 ## [0.1.1] - Previous release

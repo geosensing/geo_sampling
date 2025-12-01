@@ -159,8 +159,8 @@ import geo_sampling as gs
 
 # One-liner using convenience function
 sample = gs.sample_roads_for_region(
-    "Singapore", "Central", 
-    n=100, 
+    "Singapore", "Central",
+    n=100,
     admin_level=1,
     strategy="random",
     seed=42
@@ -274,7 +274,7 @@ for i in ${!COUNTRIES[@]}; do
     country=${COUNTRIES[$i]}
     region=${REGIONS[$i]}
     output="${country,,}_${region,,// /_}.csv"
-    
+
     echo "Processing $country - $region..."
     geo-sampling workflow \\
         --country "$country" \\
@@ -292,19 +292,19 @@ import geo_sampling as gs
 
 regions = [
     ("Singapore", "Central"),
-    ("Thailand", "Trang"), 
+    ("Thailand", "Trang"),
     ("India", "NCT of Delhi")
 ]
 
 for country, region in regions:
     output = f"{country.lower()}_{region.lower().replace(' ', '_')}.csv"
-    
+
     print(f"Processing {country} - {region}...")
     sample = gs.sample_roads_for_region(country, region, n=500)
-    
+
     sampler = gs.RoadSampler(sample)
     sampler.save_csv(sample, output)
-    
+
     gs.plot_road_segments(sample, title=f"{country} - {region}")
 """
     print(python_batch)
@@ -366,24 +366,24 @@ all_samples = []
 
 for province, n in zip(provinces, sample_sizes):
     print(f"Processing {province}...")
-    
+
     # Extract roads
     extractor = gs.RoadExtractor("Thailand", province, admin_level=1)
     roads = extractor.get_roads(road_types=road_types)
-    
+
     # Stratified sampling to maintain road type proportions
     sampler = gs.RoadSampler(roads)
     sample = sampler.stratified_sample(n, seed=42)
-    
+
     # Add province information
     for segment in sample:
         segment.province = province  # Custom attribute
-    
+
     all_samples.extend(sample)
-    
+
     # Save individual province samples
     sampler.save_csv(sample, f"{province.lower()}_sample.csv")
-    
+
     # Quick analysis
     summary = sampler.get_road_type_summary()
     print(f"  {province}: {dict(summary)}")

@@ -82,7 +82,7 @@ sample_roads input_roads.csv output_sample.csv --sample-size 100
 ## Documentation
 
 * [Installation Guide](docs/install.rst)
-* [Usage Examples](docs/usage.rst)  
+* [Usage Examples](docs/usage.rst)
 * [Sample Workflow](docs/workflow.rst)
 
 For complete documentation, visit the [project documentation page](https://geosensing.github.io/geo_sampling/).

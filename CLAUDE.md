@@ -11,7 +11,7 @@ This is a Python package for geographic road sampling that enables random sampli
 The package consists of three main modules:
 
 - **geo_roads.py**: Downloads GADM administrative boundaries and OSM data from BBBike.org, processes road shapefiles, splits long segments into 500m chunks, and outputs CSV data. Provides the `geo_roads` CLI command.
-- **sample_roads.py**: Takes processed road data and randomly samples segments based on specified criteria (road types, sample size). Provides the `sample_roads` CLI command.  
+- **sample_roads.py**: Takes processed road data and randomly samples segments based on specified criteria (road types, sample size). Provides the `sample_roads` CLI command.
 - **utils.py**: Contains plotting and CSV writing utilities shared across modules.
 
 ## Development Commands
@@ -53,7 +53,7 @@ The package provides two main CLI commands installed via setuptools entry points
 
 Environment variables for testing:
 - `COUNTRY_NAME`: Country for test data (default: Singapore)
-- `REGION_NAME`: Region within country (default: North)  
+- `REGION_NAME`: Region within country (default: North)
 - `ADM_LEVEL`: Administrative level (default: 1)
 
 ## Data Flow

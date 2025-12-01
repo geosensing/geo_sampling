@@ -30,7 +30,7 @@ Get all the roads in a specific region from OpenStreetMap.
 	  --no-header           Output without the header
 	  --plot                Plot the output
 
-  
+
 Output File Format
 ******************
 
@@ -75,7 +75,7 @@ By default, the output will be saved in ``output.csv`` and all the road segments
 .. image:: _images/tha_trang.png
 
 
-To run the script for ``Delhi, India`` and to save the output as ``delhi-roads.csv``: 
+To run the script for ``Delhi, India`` and to save the output as ``delhi-roads.csv``:
 
 ::
 
@@ -118,7 +118,7 @@ Get a random sample of road segments, of all roads or specific road types.
 Examples
 ********
 
-To get a random sample of 1,0000 road segments of road types `primary`, `secondary`, `tertiary` and `trunk`: 
+To get a random sample of 1,0000 road segments of road types `primary`, `secondary`, `tertiary` and `trunk`:
 
 ::
 

@@ -38,7 +38,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["check-manifest"]
 test = ["coverage", "pytest"]
-docs = ["sphinx>=4.0", "sphinx_rtd_theme", "tomli>=1.2.0;python_version<'3.11'"]
+docs = ["sphinx>=4.0", "furo"]
 
 [project.urls]
 Homepage = "https://github.com/geosensing/geo_sampling"
@@ -55,4 +55,4 @@ module-root = ""
 [dependency-groups]
 dev = ["pytest>=7.0", "pytest-cov>=4.0", "ruff>=0.7.0", "mypy>=1.0", "pre-commit>=3.0.0"]
 test = ["pytest>=7.0", "pytest-cov>=4.0"]
-docs = ["sphinx>=4.0", "sphinx_rtd_theme", "tomli>=1.2.0;python_version<'3.11'"]
+docs = ["sphinx>=4.0", "furo"]
