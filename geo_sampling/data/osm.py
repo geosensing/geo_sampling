@@ -3,7 +3,7 @@
 import os
 import time
 import zipfile
-from typing import List, Tuple, Optional
+from typing import List, Optional
 from urllib.parse import urlencode
 
 import requests
@@ -74,7 +74,7 @@ class OSMProvider:
         Returns:
             Extract job ID for checking status
         """
-        print(f"Submitting extract request...")
+        print("Submitting extract request...")
         response = requests.get(extract_url, timeout=30)
         response.raise_for_status()
         
