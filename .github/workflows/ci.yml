@@ -11,10 +11,22 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        include:
+          # Cross-platform testing with Python 3.11
+          - os: ubuntu-latest
+            python-version: "3.11"
+          - os: windows-latest
+            python-version: "3.11"
+          - os: macos-latest
+            python-version: "3.11"
+          # Multi-version testing on Ubuntu
+          - os: ubuntu-latest
+            python-version: "3.12"
+          - os: ubuntu-latest
+            python-version: "3.13"
 
     steps:
     - uses: actions/checkout@v4
@@ -30,11 +42,14 @@ jobs:
     - name: Install dependencies
       run: uv sync --group dev --group test
     
-    - name: Run ruff linting
-      run: uv run ruff check .
+    - name: Cache pre-commit
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
     
-    - name: Run ruff formatting check
-      run: uv run ruff format --check .
+    - name: Run pre-commit hooks
+      run: uv run pre-commit run --all-files
     
     - name: Test with pytest
       run: uv run pytest
