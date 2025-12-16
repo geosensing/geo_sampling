@@ -33,6 +33,7 @@ dependencies = [
     "beautifulsoup4>=4.10.0",
     "requests>=2.32.0",
     "click>=8.0.0",
+    "pandas>=2.0.0",
 ]
 
 [project.optional-dependencies]
@@ -63,3 +64,15 @@ docs = [
     "sphinx-design>=0.5.0",
     "sphinx-copybutton>=0.5.0"
 ]
+
+[tool.deptry]
+extend_exclude = ["docs", "tests", "examples", "scripts"]
+ignore_notebooks = true
+
+[tool.deptry.package_module_name_map]
+beautifulsoup4 = "bs4"
+check-manifest = "check_manifest"
+linkify-it-py = "linkify_it"
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["check-manifest", "coverage", "pytest", "sphinx", "furo"]
