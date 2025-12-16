@@ -65,7 +65,7 @@ print("Road types:", list(summary['road_types']))
 sample = gs.sample_roads_for_region(
     "Thailand", "Bangkok",
     n=500,  # Sample size
-    strategy="stratified",  # Maintain road type proportions  
+    strategy="stratified",  # Maintain road type proportions
     road_types=["primary", "secondary", "tertiary"],  # Focus on major roads
     seed=42  # Reproducible results
 )
@@ -88,7 +88,7 @@ REGIONS=("Bangkok" "Chiang Mai" "Phuket")
 
 for region in "${REGIONS[@]}"; do
     echo "Processing $region..."
-    
+
     geo-sampling workflow "Thailand" "$region" \
         --sample-size 200 \
         --strategy stratified \
@@ -102,7 +102,7 @@ done
 ### 1. Start Small
 Begin with small administrative areas to test your workflow before scaling up.
 
-### 2. Check Data Quality  
+### 2. Check Data Quality
 Always inspect a few segments manually:
 ```python
 # Look at first few segments
@@ -125,7 +125,7 @@ import json
 
 metadata = {
     "country": "Singapore",
-    "region": "Central", 
+    "region": "Central",
     "sample_size": len(sample),
     "strategy": "stratified",
     "road_types": ["primary", "secondary"],
@@ -150,5 +150,5 @@ with open("sample_metadata.json", "w") as f:
 Ready for more advanced usage? Check out:
 
 - 🎯 [Advanced Sampling Strategies](examples/advanced.md)
-- 💻 [Complete CLI Reference](examples/cli-usage.md)  
+- 💻 [Complete CLI Reference](examples/cli-usage.md)
 - 🐍 [Python API Examples](examples/python-api.md)

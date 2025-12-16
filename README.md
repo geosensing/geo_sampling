@@ -85,8 +85,8 @@ import geo_sampling as gs
 
 # Quick sampling for research
 sample = gs.sample_roads_for_region(
-    "Singapore", "Central", 
-    n=100, 
+    "Singapore", "Central",
+    n=100,
     strategy="random"
 )
 

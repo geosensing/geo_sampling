@@ -10,12 +10,12 @@ Geo-sampling is a Python package that helps researchers randomly sample street l
 
 ## Features
 
-✨ **Simple CLI & Python API** - Easy to use from command line or Python scripts  
-🌍 **Global Coverage** - Works with any country/region via OpenStreetMap  
-📊 **Multiple Sampling Strategies** - Random, stratified, and filtered sampling  
-🎯 **Road Type Filtering** - Focus on specific road types (highways, residential, etc.)  
-📈 **Built-in Visualization** - Plot samples on maps for validation  
-💾 **CSV Export** - Standard output format for analysis tools  
+✨ **Simple CLI & Python API** - Easy to use from command line or Python scripts
+🌍 **Global Coverage** - Works with any country/region via OpenStreetMap
+📊 **Multiple Sampling Strategies** - Random, stratified, and filtered sampling
+🎯 **Road Type Filtering** - Focus on specific road types (highways, residential, etc.)
+📈 **Built-in Visualization** - Plot samples on maps for validation
+💾 **CSV Export** - Standard output format for analysis tools
 
 ## Quick Start
 

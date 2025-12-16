@@ -44,8 +44,8 @@ import geo_sampling as gs
 
 # Quick sampling for research
 sample = gs.sample_roads_for_region(
-    "Singapore", "Central", 
-    n=100, 
+    "Singapore", "Central",
+    n=100,
     strategy="random",
     seed=42
 )
@@ -75,5 +75,5 @@ gs.plot_road_segments(sample, title="Delhi Road Sample")
 ## What's Next?
 
 - 📖 Check out [detailed examples](examples/index.md) for more complex use cases
-- 🔧 Learn about [advanced sampling strategies](examples/advanced.md)  
+- 🔧 Learn about [advanced sampling strategies](examples/advanced.md)
 - 📚 Browse the [API reference](reference/index.md) for complete documentation

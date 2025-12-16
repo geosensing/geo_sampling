@@ -73,12 +73,12 @@ for wave in range(n_waves):
     start_idx = wave * wave_size
     end_idx = start_idx + wave_size
     wave_indices = all_indices[start_idx:end_idx]
-    
+
     # Sample from this wave's pool
-    wave_sample = np.random.choice(wave_indices, 
-                                  size=samples_per_wave, 
+    wave_sample = np.random.choice(wave_indices,
+                                  size=samples_per_wave,
                                   replace=False)
-    
+
     wave_roads = roads.iloc[wave_sample]
     wave_roads.to_csv(f'wave_{wave+1}_sample.csv', index=False)
 ```
@@ -159,14 +159,14 @@ neighborhoods = stage2_roads.groupby('district')['neighborhood'].unique()
 sampled_neighborhoods = []
 for district in sampled_districts:
     district_neighborhoods = neighborhoods[district]
-    sampled = np.random.choice(district_neighborhoods, 
-                             size=min(3, len(district_neighborhoods)), 
+    sampled = np.random.choice(district_neighborhoods,
+                             size=min(3, len(district_neighborhoods)),
                              replace=False)
     sampled_neighborhoods.extend(sampled)
 
 # Stage 3: Sample roads within neighborhoods
 final_roads = roads[roads['neighborhood'].isin(sampled_neighborhoods)]
-final_sample = final_roads.sample(n=min(500, len(final_roads)), 
+final_sample = final_roads.sample(n=min(500, len(final_roads)),
                                  random_state=42)
 final_sample.to_csv('multi_stage_sample.csv', index=False)
 ```
@@ -178,39 +178,39 @@ Always validate your samples:
 ```python
 def validate_sample(sample_df, original_df):
     """Validate sample representativeness"""
-    
+
     print("Sample Validation Report")
     print("=" * 40)
-    
+
     # Sample size
     print(f"Sample size: {len(sample_df)}")
     print(f"Original size: {len(original_df)}")
     print(f"Sampling rate: {len(sample_df)/len(original_df):.2%}")
-    
+
     # Road type distribution
     print("\nRoad Type Distribution:")
     sample_dist = sample_df['road_type'].value_counts(normalize=True)
     original_dist = original_df['road_type'].value_counts(normalize=True)
-    
+
     comparison = pd.DataFrame({
         'Sample': sample_dist,
         'Original': original_dist,
         'Difference': sample_dist - original_dist
     })
     print(comparison)
-    
+
     # Geographic spread
     print("\nGeographic Coverage:")
     print(f"Latitude range - Sample: [{sample_df['latitude'].min():.4f}, "
           f"{sample_df['latitude'].max():.4f}]")
     print(f"Latitude range - Original: [{original_df['latitude'].min():.4f}, "
           f"{original_df['latitude'].max():.4f}]")
-    
+
     print(f"Longitude range - Sample: [{sample_df['longitude'].min():.4f}, "
           f"{sample_df['longitude'].max():.4f}]")
     print(f"Longitude range - Original: [{original_df['longitude'].min():.4f}, "
           f"{original_df['longitude'].max():.4f}]")
-    
+
     return comparison
 
 # Run validation

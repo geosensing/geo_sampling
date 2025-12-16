@@ -54,5 +54,5 @@ uv run make html
 ## Next Steps
 
 - 🚀 Try the [Quick Start Guide](quickstart.md)
-- 🔍 Explore [detailed examples](examples/index.md) 
+- 🔍 Explore [detailed examples](examples/index.md)
 - 📚 Browse the [API reference](reference/index.md)

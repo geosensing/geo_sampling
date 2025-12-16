@@ -23,7 +23,7 @@ import geo_sampling as gs
 def main():
     # Configuration
     country = "India"
-    region = "NCT of Delhi" 
+    region = "NCT of Delhi"
     sample_size = 1000
 
     # Create output directory
@@ -45,7 +45,7 @@ def main():
     # Step 3: Save outputs
     all_roads_file = os.path.join(output_dir, "delhi_all_roads.csv")
     sample_file = os.path.join(output_dir, "delhi_sampled_roads.csv")
-    
+
     sampler.save_csv(all_roads, all_roads_file)
     sampler.save_csv(sample, sample_file)
     print(f"✓ Saved outputs to {output_dir}")
@@ -70,14 +70,14 @@ This example produces real files you can examine:
 
 :::{grid-item}
 **📄 delhi_all_roads.csv**
-- **Size**: 1,220 road segments  
+- **Size**: 1,220 road segments
 - **Coverage**: Complete NCT of Delhi road network
 - **Types**: All road types (trunk, primary, residential, etc.)
 - [📥 Download](../../examples/outputs/01_basic_workflow/delhi_all_roads.csv)
 :::
 
 :::{grid-item}
-**📄 delhi_sampled_roads.csv** 
+**📄 delhi_sampled_roads.csv**
 - **Size**: 1,000 randomly sampled segments
 - **Method**: Random sampling with seed=42
 - **Use**: Ready for field data collection
@@ -118,7 +118,7 @@ geo-sampling workflow "India" "NCT of Delhi" \
 geo-sampling extract "India" "NCT of Delhi" \
     --output delhi_all_roads.csv
 
-# Create random sample  
+# Create random sample
 geo-sampling sample delhi_all_roads.csv \
     --sample-size 1000 \
     --strategy random \
@@ -170,7 +170,7 @@ major_roads = extractor.get_roads(
 print(f"Major roads: {len(major_roads)} segments")
 
 # Sample from major roads only
-sampler = gs.RoadSampler(major_roads) 
+sampler = gs.RoadSampler(major_roads)
 major_sample = sampler.random_sample(500, seed=42)
 
 # Road type distribution
@@ -192,7 +192,7 @@ from datetime import datetime
 
 def research_sampling_workflow(country, region, sample_size, study_name):
     """Complete research workflow with metadata tracking."""
-    
+
     # Track methodology
     metadata = {
         "study_name": study_name,
@@ -202,7 +202,7 @@ def research_sampling_workflow(country, region, sample_size, study_name):
         "date_created": datetime.now().isoformat(),
         "methodology": "stratified_sampling"
     }
-    
+
     # Extract and sample
     sample = gs.sample_roads_for_region(
         country, region,
@@ -210,33 +210,33 @@ def research_sampling_workflow(country, region, sample_size, study_name):
         strategy="stratified",
         seed=42
     )
-    
+
     # Convert to DataFrame for analysis
     sampler = gs.RoadSampler(sample)
     df = sampler.to_dataframe()
-    
+
     # Add study metadata to DataFrame
     df['study_id'] = study_name
     df['sample_date'] = metadata['date_created']
-    
+
     # Save with metadata
     output_file = f"{study_name.lower().replace(' ', '_')}_sample.csv"
     df.to_csv(output_file, index=False)
-    
+
     # Save metadata
     with open(f"{study_name.lower().replace(' ', '_')}_metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
-    
+
     print(f"Study '{study_name}' complete:")
     print(f"  Sample size: {len(sample)}")
     print(f"  Output: {output_file}")
     print(f"  Road types: {df['osm_type'].nunique()}")
-    
+
     return df
 
 # Run research workflow
 study_data = research_sampling_workflow(
-    "Thailand", "Bangkok", 
+    "Thailand", "Bangkok",
     sample_size=500,
     study_name="Bangkok Traffic Study 2024"
 )
@@ -249,45 +249,45 @@ import geo_sampling as gs
 
 def batch_process_regions(regions, sample_size=200):
     """Process multiple regions with consistent methodology."""
-    
+
     results = {}
-    
+
     for country, region in regions:
         print(f"Processing {region}, {country}...")
-        
+
         try:
             # Sample roads
             sample = gs.sample_roads_for_region(
                 country, region,
                 n=sample_size,
-                strategy="stratified", 
+                strategy="stratified",
                 seed=42
             )
-            
+
             # Save output
             filename = f"{country.lower()}_{region.lower().replace(' ', '_')}.csv"
             sampler = gs.RoadSampler(sample)
             sampler.save_csv(sample, filename)
-            
+
             # Track results
             results[f"{country}-{region}"] = {
                 "sample_size": len(sample),
                 "filename": filename,
                 "road_types": len(sampler.get_road_type_summary())
             }
-            
+
             print(f"  ✓ {len(sample)} segments → {filename}")
-            
+
         except Exception as e:
             print(f"  ✗ Failed: {e}")
             results[f"{country}-{region}"] = {"error": str(e)}
-    
+
     return results
 
 # Process multiple regions
 regions = [
     ("Singapore", "Central"),
-    ("Thailand", "Bangkok"), 
+    ("Thailand", "Bangkok"),
     ("India", "NCT of Delhi")
 ]
 
@@ -324,7 +324,7 @@ print("Road Type Distribution:")
 print(road_counts)
 
 # Calculate segment lengths (rough approximation)
-df['length_km'] = ((df['end_lat'] - df['start_lat'])**2 + 
+df['length_km'] = ((df['end_lat'] - df['start_lat'])**2 +
                    (df['end_long'] - df['start_long'])**2)**0.5 * 111.32
 
 # Summary statistics by road type
@@ -357,7 +357,7 @@ plt.show()
 ## Next Steps
 
 - 🎯 Explore [Advanced Sampling Strategies](advanced.md)
-- 💻 Learn the [Command Line Interface](cli-usage.md)  
+- 💻 Learn the [Command Line Interface](cli-usage.md)
 - 📚 Check the [API Reference](../reference/index.md)
 - 📁 Download [all example outputs](../../examples/outputs/)
 

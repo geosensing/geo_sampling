@@ -221,7 +221,7 @@ geo-sampling extract "Thailand" "Trang" \
 
 geo-sampling extract "Thailand" "Phuket" \
     --road-types primary \
-    --road-types secondary \  
+    --road-types secondary \
     --road-types tertiary \
     --output phuket_roads.csv
 
@@ -264,7 +264,7 @@ Target sample size: 100
 
 Sample summary:
   primary: 25 (25.0%)
-  residential: 35 (35.0%)  
+  residential: 35 (35.0%)
   secondary: 20 (20.0%)
   tertiary: 15 (15.0%)
   unclassified: 5 (5.0%)
@@ -295,7 +295,7 @@ $(OUTPUT_DIR)/$(REGION)_roads.csv:
 	geo-sampling extract "$(COUNTRY)" "$(REGION)" \
 		--output $@
 
-$(OUTPUT_DIR)/$(REGION)_sample.csv: $(OUTPUT_DIR)/$(REGION)_roads.csv  
+$(OUTPUT_DIR)/$(REGION)_sample.csv: $(OUTPUT_DIR)/$(REGION)_roads.csv
 	geo-sampling sample $< \
 		--sample-size $(SAMPLE_SIZE) \
 		--strategy stratified \
@@ -352,7 +352,7 @@ docker run -v $(PWD)/data:/workspace/data geo-sampling \
 # Main help
 geo-sampling --help
 
-# Command-specific help  
+# Command-specific help
 geo-sampling extract --help
 geo-sampling sample --help
 geo-sampling workflow --help
@@ -374,7 +374,7 @@ geo-sampling --version
 ## Next Steps
 
 - 🐍 See [Python API Examples](python-api.md) for programmatic usage
-- 🎯 Explore [Advanced Sampling](advanced.md) strategies  
+- 🎯 Explore [Advanced Sampling](advanced.md) strategies
 - 📚 Check the [API Reference](../reference/index.md)
 - 📁 Download [example outputs](../../examples/outputs/)
 

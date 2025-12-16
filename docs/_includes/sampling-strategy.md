@@ -7,7 +7,7 @@ This package implements a systematic approach to sampling street locations for d
 Get all the streets in the region of interest from [OpenStreetMap](https://www.openstreetmap.org/). The package:
 
 1. Downloads administrative boundary data from [GADM](http://www.gadm.org/) in ESRI format
-2. Identifies the geographic bounds of your region of interest  
+2. Identifies the geographic bounds of your region of interest
 3. Extracts road data from [BBBike.org](http://extract.bbbike.org) for the bounded area
 4. Processes the road network into manageable segments
 
@@ -23,7 +23,7 @@ Administrative levels are hierarchical - cities are nested in states, which are 
 
 ### Road Type Classification
 The package preserves OpenStreetMap road classifications:
-- **trunk**: National highways and major arterials  
+- **trunk**: National highways and major arterials
 - **primary**: Major roads connecting cities/towns
 - **secondary**: Important roads for regional traffic
 - **tertiary**: Roads connecting smaller settlements
@@ -33,7 +33,7 @@ The package preserves OpenStreetMap road classifications:
 
 ### Sampling Methods
 - **Random sampling**: Equal probability selection across all segments
-- **Stratified sampling**: Maintains proportional representation of road types  
+- **Stratified sampling**: Maintains proportional representation of road types
 - **Filtered sampling**: Restricts sampling to specific road types
 - **Length-based sampling**: Target specific total coverage distances
 
