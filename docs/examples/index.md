@@ -115,8 +115,8 @@ advanced
 
 ```bash
 # Clone the repository to get example files
-git clone https://github.com/geosensing/geo_sampling.git
-cd geo_sampling
+git clone https://github.com/geosensing/geo-sampling.git
+cd geo-sampling
 
 # Install with example dependencies
 pip install -e .

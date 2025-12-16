@@ -37,8 +37,8 @@ For contributors and advanced users:
 
 ```bash
 # Clone the repository
-git clone https://github.com/geosensing/geo_sampling.git
-cd geo_sampling
+git clone https://github.com/geosensing/geo-sampling.git
+cd geo-sampling
 
 # Install in development mode with all dependencies
 uv sync --group dev --group test --group docs

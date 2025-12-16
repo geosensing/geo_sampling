@@ -2,7 +2,7 @@
 
 **Randomly sample locations on streets for data collection and research**
 
-[![CI](https://github.com/geosensing/geo_sampling/actions/workflows/ci.yml/badge.svg)](https://github.com/geosensing/geo_sampling/actions/workflows/ci.yml)
+[![CI](https://github.com/geosensing/geo-sampling/actions/workflows/ci.yml/badge.svg)](https://github.com/geosensing/geo-sampling/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/geo_sampling.svg?maxAge=3600)](https://pypi.python.org/pypi/geo_sampling)
 [![Downloads](https://pepy.tech/badge/geo-sampling)](https://pepy.tech/project/geo-sampling)
 
@@ -91,12 +91,12 @@ Complete documentation of classes and functions
 ## Support
 
 - 📖 **Documentation**: You're reading it!
-- 🐛 **Issues**: [GitHub Issues](https://github.com/geosensing/geo_sampling/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/geosensing/geo_sampling/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/geosensing/geo-sampling/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/geosensing/geo-sampling/discussions)
 
 ## License
 
-Released under the [MIT License](https://github.com/geosensing/geo_sampling/blob/public/LICENSE).
+Released under the [MIT License](https://github.com/geosensing/geo-sampling/blob/public/LICENSE).
 
 ---
 

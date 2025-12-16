@@ -13,8 +13,8 @@ pip install geo-sampling
 For development, install with development dependencies:
 
 ```bash
-git clone https://github.com/geosensing/geo_sampling.git
-cd geo_sampling
+git clone https://github.com/geosensing/geo-sampling.git
+cd geo-sampling
 uv sync --group dev
 ```
 
