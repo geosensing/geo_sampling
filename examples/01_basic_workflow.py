@@ -5,22 +5,65 @@
 Basic Workflow Example - Delhi Road Sampling
 
 This example demonstrates the complete end-to-end workflow for extracting
-and sampling road segments from Delhi, India using the geo_sampling package.
+and sampling road segments from Delhi, India using both the Python API
+and CLI commands of the geo_sampling package.
 
 The workflow includes:
 1. Extracting all road segments from Delhi
 2. Randomly sampling 1000 road segments
 3. Visualizing the results
 4. Saving the data to CSV
+5. Showing equivalent CLI commands
 
 NETWORK REQUIRED: This example requires an active internet connection to download
 geographic data from BBBike.org and GADM. The example will fail if the network
 is unavailable.
+
+OUTPUT: Results are saved to examples/outputs/01_basic_workflow/
 """
 
 import os
 import time
 import geo_sampling as gs
+
+
+def show_cli_equivalent():
+    """Show equivalent CLI commands for this workflow."""
+    print("\n" + "=" * 60)
+    print("EQUIVALENT CLI COMMANDS")
+    print("=" * 60)
+
+    print("To reproduce this workflow using the command line:\n")
+
+    print("# Option 1: Full workflow in one command")
+    print('geo-sampling workflow "India" "NCT of Delhi" \\')
+    print("    --sample-size 1000 \\")
+    print(
+        "    --output examples/outputs/01_basic_workflow/delhi_workflow_sample.csv \\"
+    )
+    print("    --plot \\")
+    print("    --seed 42")
+    print()
+
+    print("# Option 2: Step-by-step approach")
+    print("# Step 1: Extract all roads")
+    print('geo-sampling extract "India" "NCT of Delhi" \\')
+    print("    --output examples/outputs/01_basic_workflow/delhi_all_roads.csv")
+    print()
+    print("# Step 2: Sample from extracted roads")
+    print(
+        "geo-sampling sample examples/outputs/01_basic_workflow/delhi_all_roads.csv \\"
+    )
+    print("    --sample-size 1000 \\")
+    print("    --strategy random \\")
+    print("    --seed 42 \\")
+    print("    --output examples/outputs/01_basic_workflow/delhi_sampled_roads.csv \\")
+    print("    --plot")
+    print()
+
+    print("# Step 3: Get information about the region")
+    print('geo-sampling info "India" "NCT of Delhi"')
+    print()
 
 
 def main():
@@ -35,9 +78,13 @@ def main():
     admin_level = 1
     sample_size = 1000
 
+    # Create output directory structure
+    output_dir = "examples/outputs/01_basic_workflow"
+    os.makedirs(output_dir, exist_ok=True)
+
     # Output files
-    all_roads_file = "delhi_all_roads.csv"
-    sampled_roads_file = "delhi_sampled_roads.csv"
+    all_roads_file = os.path.join(output_dir, "delhi_all_roads.csv")
+    sampled_roads_file = os.path.join(output_dir, "delhi_sampled_roads.csv")
 
     print(f"Region: {region}, {country}")
     print(f"Sample size: {sample_size}")
@@ -99,19 +146,30 @@ def main():
     print("Step 4: Creating visualizations...")
 
     try:
-        # Plot sample
+        import matplotlib.pyplot as plt
+
+        # Plot sample and save
         print("Creating sample plot...")
+        fig, ax = plt.subplots(figsize=(12, 8))
         gs.plot_road_segments(sample, title=f"Delhi Road Sample (N={len(sample)})")
+        sample_plot_file = os.path.join(output_dir, "delhi_sample_plot.png")
+        plt.savefig(sample_plot_file, dpi=150, bbox_inches="tight")
+        print(f"✓ Saved sample plot to: {sample_plot_file}")
 
         # Plot with comparison (if reasonable size)
         if len(all_roads) < 10000:  # Only if dataset is manageable
             print("Creating comparison plot...")
+            comparison_plot_file = os.path.join(output_dir, "delhi_comparison_plot.png")
             plotter = gs.RoadPlotter(figsize=(16, 8))
             plotter.plot_sample_comparison(all_roads, sample)
+            plt.savefig(comparison_plot_file, dpi=150, bbox_inches="tight")
+            print(f"✓ Saved comparison plot to: {comparison_plot_file}")
         else:
             print(
                 f"Skipping comparison plot (dataset too large: {len(all_roads)} segments)"
             )
+
+        plt.show()
 
     except Exception as e:
         print(f"Warning: Visualization failed: {e}")
@@ -175,6 +233,9 @@ def demonstrate_convenience_api():
 if __name__ == "__main__":
     # Run basic workflow
     main()
+
+    # Show CLI equivalents
+    show_cli_equivalent()
 
     # Demonstrate convenience API
     demonstrate_convenience_api()

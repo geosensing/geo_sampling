@@ -12,17 +12,60 @@ geo_sampling package, including:
 3. Length-based sampling for specific coverage
 4. Statistical analysis of sampling results
 5. Comparative visualizations
+6. CLI command equivalents
 
 Uses Singapore as the test region for faster execution.
 
 NETWORK REQUIRED: This example requires an active internet connection to download
 geographic data from BBBike.org and GADM. The example will fail if the network
 is unavailable.
+
+OUTPUT: Results are saved to examples/outputs/02_advanced_sampling/
 """
 
+import os
 import time
 import geo_sampling as gs
 import matplotlib.pyplot as plt
+
+
+def show_cli_equivalents():
+    """Show CLI commands equivalent to the Python sampling strategies."""
+    print("\n" + "=" * 60)
+    print("CLI EQUIVALENTS FOR ADVANCED SAMPLING")
+    print("=" * 60)
+
+    print("1. RANDOM SAMPLING:")
+    print("geo-sampling sample singapore_all_roads.csv \\")
+    print("    --sample-size 200 \\")
+    print("    --strategy random \\")
+    print("    --seed 42 \\")
+    print("    --output singapore_random_sample.csv")
+    print()
+
+    print("2. STRATIFIED SAMPLING:")
+    print("geo-sampling sample singapore_all_roads.csv \\")
+    print("    --sample-size 150 \\")
+    print("    --strategy stratified \\")
+    print("    --seed 42 \\")
+    print("    --output singapore_stratified_sample.csv")
+    print()
+
+    print("3. ROAD TYPE FILTERING:")
+    print("geo-sampling sample singapore_all_roads.csv \\")
+    print("    --sample-size 100 \\")
+    print("    --road-types primary secondary \\")
+    print("    --output singapore_filtered_sample.csv")
+    print()
+
+    print("4. COMPLETE WORKFLOW WITH FILTERING:")
+    print('geo-sampling workflow "Singapore" "Central" \\')
+    print("    --sample-size 100 \\")
+    print("    --road-types primary secondary tertiary \\")
+    print("    --strategy stratified \\")
+    print("    --plot \\")
+    print("    --output singapore_advanced_sample.csv")
+    print()
 
 
 def main():
@@ -35,6 +78,10 @@ def main():
     country = "Singapore"
     region = "Central"  # Singapore administrative region
     admin_level = 1
+
+    # Create output directory structure
+    output_dir = "examples/outputs/02_advanced_sampling"
+    os.makedirs(output_dir, exist_ok=True)
 
     print(f"Region: {region}, {country}")
     print()
@@ -62,18 +109,19 @@ def main():
         return
 
     # Step 2: Demonstrate different sampling strategies
-    demonstrate_random_sampling(sampler, all_roads)
-    demonstrate_stratified_sampling(sampler)
-    demonstrate_road_type_filtering(sampler)
-    demonstrate_length_based_sampling(sampler)
+    demonstrate_random_sampling(sampler, all_roads, output_dir)
+    demonstrate_stratified_sampling(sampler, output_dir)
+    demonstrate_road_type_filtering(sampler, output_dir)
+    demonstrate_length_based_sampling(sampler, output_dir)
 
     # Step 3: Comparative analysis
-    comparative_analysis(sampler, all_roads)
+    comparative_analysis(sampler, all_roads, output_dir)
 
     print("\nAdvanced sampling example completed!")
+    print(f"Check outputs in: {output_dir}")
 
 
-def demonstrate_random_sampling(sampler, all_roads):
+def demonstrate_random_sampling(sampler, all_roads, output_dir):
     """Demonstrate random sampling with different parameters."""
     print("=" * 50)
     print("Random Sampling Strategies")
@@ -99,10 +147,15 @@ def demonstrate_random_sampling(sampler, all_roads):
     if random_sample != random_sample3:
         print("  ✓ Different results with different seed")
 
+    # Save random sample
+    random_sample_file = os.path.join(output_dir, "singapore_random_sample.csv")
+    sampler.save_csv(random_sample, random_sample_file)
+    print(f"  ✓ Saved random sample to: {random_sample_file}")
+
     print()
 
 
-def demonstrate_stratified_sampling(sampler):
+def demonstrate_stratified_sampling(sampler, output_dir):
     """Demonstrate stratified sampling to maintain proportions."""
     print("=" * 50)
     print("Stratified Sampling")
@@ -131,10 +184,15 @@ def demonstrate_stratified_sampling(sampler):
             f"  {road_type}: {count} ({proportion:.1f}% vs {original_prop:.1f}% original)"
         )
 
+    # Save stratified sample
+    stratified_sample_file = os.path.join(output_dir, "singapore_stratified_sample.csv")
+    sampler.save_csv(stratified_sample, stratified_sample_file)
+    print(f"✓ Saved stratified sample to: {stratified_sample_file}")
+
     print()
 
 
-def demonstrate_road_type_filtering(sampler):
+def demonstrate_road_type_filtering(sampler, output_dir):
     """Demonstrate filtering by road types."""
     print("=" * 50)
     print("Road Type Filtering")
@@ -170,10 +228,15 @@ def demonstrate_road_type_filtering(sampler):
         multi_summary = gs.RoadSampler(multi_type_sample).get_road_type_summary()
         print(f"  Types in sample: {list(multi_summary.keys())}")
 
+        # Save filtered sample
+        filtered_sample_file = os.path.join(output_dir, "singapore_filtered_sample.csv")
+        sampler.save_csv(multi_type_sample, filtered_sample_file)
+        print(f"  ✓ Saved filtered sample to: {filtered_sample_file}")
+
     print()
 
 
-def demonstrate_length_based_sampling(sampler):
+def demonstrate_length_based_sampling(sampler, output_dir):
     """Demonstrate sampling by target length coverage."""
     print("=" * 50)
     print("Length-Based Sampling")
@@ -193,7 +256,7 @@ def demonstrate_length_based_sampling(sampler):
     print()
 
 
-def comparative_analysis(sampler, all_roads):
+def comparative_analysis(sampler, all_roads, output_dir):
     """Compare different sampling strategies visually and statistically."""
     print("=" * 50)
     print("Comparative Analysis")
@@ -250,8 +313,11 @@ def comparative_analysis(sampler, all_roads):
         )
 
         plt.tight_layout()
-        plt.savefig("singapore_sampling_comparison.png", dpi=150, bbox_inches="tight")
-        print("✓ Saved comparison plot: singapore_sampling_comparison.png")
+        comparison_plot_file = os.path.join(
+            output_dir, "singapore_comparison_plots.png"
+        )
+        plt.savefig(comparison_plot_file, dpi=150, bbox_inches="tight")
+        print(f"✓ Saved comparison plot: {comparison_plot_file}")
         plt.show()
 
     except Exception as e:
@@ -301,3 +367,4 @@ def plot_segments_on_axis(ax, segments, title):
 
 if __name__ == "__main__":
     main()
+    show_cli_equivalents()

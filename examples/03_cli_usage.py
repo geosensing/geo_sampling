@@ -58,7 +58,7 @@ def demonstrate_extract_command():
     print("=" * 60)
 
     print("Extract all roads from Delhi, India:")
-    cli_cmd = 'geo-sampling extract --country "India" --region "NCT of Delhi" --output delhi_roads.csv'
+    cli_cmd = 'geo-sampling extract "India" "NCT of Delhi" --output delhi_roads.csv'
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
@@ -70,22 +70,20 @@ extractor = gs.RoadExtractor("India", "NCT of Delhi")
 roads = extractor.get_roads()
 
 # Save to CSV
-sampler = gs.RoadSampler(roads)
-sampler.save_csv(roads, "delhi_roads.csv")
+extractor.save_csv("delhi_roads.csv")
 print(f"Extracted {len(roads)} road segments")
 """
     print(python_code)
 
     print("\nExtract only major roads:")
-    cli_cmd = 'geo-sampling extract --country "India" --region "NCT of Delhi" --road-types primary secondary trunk --output delhi_major_roads.csv'
+    cli_cmd = 'geo-sampling extract "India" "NCT of Delhi" --road-types primary --road-types secondary --road-types trunk --output delhi_major_roads.csv'
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
     python_code = """
 # Extract filtered roads
 roads = extractor.get_roads(road_types=["primary", "secondary", "trunk"])
-sampler = gs.RoadSampler(roads)
-sampler.save_csv(roads, "delhi_major_roads.csv")
+extractor.save_csv("delhi_major_roads.csv", road_types=["primary", "secondary", "trunk"])
 """
     print(python_code)
     print()
@@ -98,7 +96,7 @@ def demonstrate_sample_command():
     print("=" * 60)
 
     print("Random sample of 1000 segments:")
-    cli_cmd = "geo-sampling sample delhi_roads.csv --n 1000 --strategy random --output delhi_sample_1000.csv"
+    cli_cmd = "geo-sampling sample delhi_roads.csv --sample-size 1000 --strategy random --output delhi_sample_1000.csv"
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
@@ -118,7 +116,7 @@ sampler.save_csv(sample, "delhi_sample_1000.csv")
     print(python_code)
 
     print("\nStratified sample maintaining proportions:")
-    cli_cmd = "geo-sampling sample delhi_roads.csv --n 500 --strategy stratified --seed 42 --output delhi_stratified_500.csv"
+    cli_cmd = "geo-sampling sample delhi_roads.csv --sample-size 500 --strategy stratified --seed 42 --output delhi_stratified_500.csv"
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
@@ -130,7 +128,7 @@ sampler.save_csv(sample, "delhi_stratified_500.csv")
     print(python_code)
 
     print("\nSample only specific road types:")
-    cli_cmd = "geo-sampling sample delhi_roads.csv --n 200 --road-types primary secondary --output delhi_primary_secondary.csv"
+    cli_cmd = "geo-sampling sample delhi_roads.csv --sample-size 200 --road-types primary --road-types secondary --output delhi_primary_secondary.csv"
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
@@ -150,7 +148,7 @@ def demonstrate_workflow_command():
     print("=" * 60)
 
     print("Complete workflow in one command:")
-    cli_cmd = 'geo-sampling workflow --country "Singapore" --region "Central" --n 100 --strategy random --output singapore_sample.csv'
+    cli_cmd = 'geo-sampling workflow "Singapore" "Central" --sample-size 100 --strategy random --output singapore_sample.csv'
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
@@ -173,7 +171,7 @@ sampler.save_csv(sample, "singapore_sample.csv")
     print(python_code)
 
     print("\nWorkflow with visualization:")
-    cli_cmd = 'geo-sampling workflow --country "Singapore" --region "Central" --n 100 --plot --output singapore_sample.csv'
+    cli_cmd = 'geo-sampling workflow "Singapore" "Central" --sample-size 100 --plot --output singapore_sample.csv'
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
@@ -197,48 +195,31 @@ def demonstrate_info_command():
     print("4. INFO COMMAND")
     print("=" * 60)
 
-    print("List all available countries:")
-    cli_cmd = "geo-sampling info --list-countries"
+    print("Get road information for a region:")
+    cli_cmd = 'geo-sampling info "Thailand" "Bangkok"'
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
     python_code = """
 import geo_sampling as gs
 
-# List countries (via data provider)
-provider = gs.GADMProvider()
-countries = provider.list_countries()
-print("Available countries:", countries[:10])  # Show first 10
+# Get road summary for a region
+summary = gs.get_road_summary("Thailand", "Bangkok", admin_level=1)
+print(f"Total segments: {summary['total_segments']:,}")
+print(f"Road types: {summary['road_types']}")
+print(f"Road type breakdown: {summary['road_type_counts']}")
 """
     print(python_code)
 
-    print("\nList regions in a country:")
-    cli_cmd = 'geo-sampling info --country "Thailand" --level 1'
+    print("\nGet info with custom admin level:")
+    cli_cmd = 'geo-sampling info "Thailand" "Bangkok" --admin-level 2'
     print(f"CLI: {cli_cmd}")
 
     print("\nEquivalent Python API:")
     python_code = """
-# List regions in Thailand at level 1
-regions = provider.list_regions("Thailand", admin_level=1)
-print(f"Regions in Thailand: {regions}")
-"""
-    print(python_code)
-
-    print("\nGet road type summary for extracted data:")
-    cli_cmd = "geo-sampling info --file delhi_roads.csv --road-types"
-    print(f"CLI: {cli_cmd}")
-
-    print("\nEquivalent Python API:")
-    python_code = """
-# Analyze existing CSV file
-roads = gs.load_segments_from_csv("delhi_roads.csv")
-summary = gs.get_road_summary(roads)
-print("Road type summary:", summary)
-
-# Or using sampler
-sampler = gs.RoadSampler(roads)
-summary = sampler.get_road_type_summary()
-print("Road types:", dict(summary))
+# Get summary at different administrative level
+summary = gs.get_road_summary("Thailand", "Bangkok", admin_level=2)
+print("Road summary at admin level 2:", summary)
 """
     print(python_code)
     print()
@@ -254,9 +235,9 @@ def demonstrate_advanced_cli_usage():
 
     # Extract then sample
     commands = [
-        'geo-sampling extract --country "India" --region "NCT of Delhi" --output delhi.csv',
-        "geo-sampling sample delhi.csv --n 1000 --output delhi_1k.csv",
-        "geo-sampling info --file delhi_1k.csv --road-types",
+        'geo-sampling extract "India" "NCT of Delhi" --output delhi.csv',
+        "geo-sampling sample delhi.csv --sample-size 1000 --output delhi_1k.csv",
+        'geo-sampling info "India" "NCT of Delhi"',
     ]
 
     print("# Extract, then sample, then analyze")
@@ -277,9 +258,9 @@ for i in ${!COUNTRIES[@]}; do
 
     echo "Processing $country - $region..."
     geo-sampling workflow \\
-        --country "$country" \\
-        --region "$region" \\
-        --n 500 \\
+        "$country" \\
+        "$region" \\
+        --sample-size 500 \\
         --output "$output" \\
         --plot
 done
@@ -324,9 +305,9 @@ def show_complete_example():
 
     print("Step 1: Extract roads from multiple provinces")
     commands = [
-        'geo-sampling extract --country "Thailand" --region "Trang" --road-types primary secondary tertiary --output trang_roads.csv',
-        'geo-sampling extract --country "Thailand" --region "Phuket" --road-types primary secondary tertiary --output phuket_roads.csv',
-        'geo-sampling extract --country "Thailand" --region "Krabi" --road-types primary secondary tertiary --output krabi_roads.csv',
+        'geo-sampling extract "Thailand" "Trang" --road-types primary --road-types secondary --road-types tertiary --output trang_roads.csv',
+        'geo-sampling extract "Thailand" "Phuket" --road-types primary --road-types secondary --road-types tertiary --output phuket_roads.csv',
+        'geo-sampling extract "Thailand" "Krabi" --road-types primary --road-types secondary --road-types tertiary --output krabi_roads.csv',
     ]
 
     for cmd in commands:
@@ -334,9 +315,9 @@ def show_complete_example():
 
     print("\nStep 2: Sample from each province")
     sample_commands = [
-        "geo-sampling sample trang_roads.csv --n 200 --strategy stratified --output trang_sample.csv",
-        "geo-sampling sample phuket_roads.csv --n 150 --strategy stratified --output phuket_sample.csv",
-        "geo-sampling sample krabi_roads.csv --n 100 --strategy stratified --output krabi_sample.csv",
+        "geo-sampling sample trang_roads.csv --sample-size 200 --strategy stratified --output trang_sample.csv",
+        "geo-sampling sample phuket_roads.csv --sample-size 150 --strategy stratified --output phuket_sample.csv",
+        "geo-sampling sample krabi_roads.csv --sample-size 100 --strategy stratified --output krabi_sample.csv",
     ]
 
     for cmd in sample_commands:
@@ -344,9 +325,9 @@ def show_complete_example():
 
     print("\nStep 3: Analyze the samples")
     analyze_commands = [
-        "geo-sampling info --file trang_sample.csv --road-types",
-        "geo-sampling info --file phuket_sample.csv --road-types",
-        "geo-sampling info --file krabi_sample.csv --road-types",
+        'geo-sampling info "Thailand" "Trang"',
+        'geo-sampling info "Thailand" "Phuket"',
+        'geo-sampling info "Thailand" "Krabi"',
     ]
 
     for cmd in analyze_commands:

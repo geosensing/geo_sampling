@@ -14,35 +14,96 @@ project_meta = metadata.metadata("geo-sampling")
 
 # -- General configuration ------------------------------------------------
 
-extensions = ["sphinx.ext.autodoc"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "sphinx_design",
+    "sphinx_copybutton",
+    "myst_parser",
+]
 
 templates_path = ["_templates"]
 
-SOURCE_SUFFIX = ".rst"
+# Support both .rst and .md files
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
-MASTER_DOC = "index"
+master_doc = "index"
 
-PROJECT = project_meta["name"].replace("-", " ").title()
-AUTHORS = project_meta.get("author", "Suriyan Laohaprapanon, Gaurav Sood")
-COPYRIGHT_INFO = f"2016--2025, {AUTHORS}"
-AUTHOR = AUTHORS
+project = project_meta["name"].replace("-", " ").title()
+authors = project_meta.get("author", "Suriyan Laohaprapanon, Gaurav Sood")
+copyright = f"2016--2025, {authors}"
+author = authors
 
-VERSION = project_meta["version"]
-RELEASE = project_meta["version"]
+version = project_meta["version"]
+release = project_meta["version"]
 
-LANGUAGE = None
+language = "en"
 
-EXCLUDE_PATTERNS = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "_includes"]
 
-PYGMENTS_STYLE = "sphinx"
-TODO_INCLUDE_TODOS = False
+pygments_style = "sphinx"
+todo_include_todos = False
+
+# -- MyST Parser Configuration --------------------------------------------
+
+myst_enable_extensions = [
+    "colon_fence",
+    "deflist",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "tasklist",
+]
+
+myst_heading_anchors = 3
+
+# -- Intersphinx Configuration ------------------------------------------
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "matplotlib": ("https://matplotlib.org/stable", None),
+    "shapely": ("https://shapely.readthedocs.io/en/stable", None),
+}
 
 # -- Options for HTML output ----------------------------------------------
 
-HTML_THEME = "furo"
+html_theme = "furo"
 html_static_path = ["_static"]
+html_css_files = ["custom.css"]
+html_title = f"{project} {version}"
+html_short_title = project
 
-HTMLHELP_BASENAME = "Geosamplingdoc"
+# Furo theme options
+html_theme_options = {
+    "light_css_variables": {
+        "color-brand-primary": "#2962ff",
+        "color-brand-content": "#2962ff",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#82b1ff",
+        "color-brand-content": "#82b1ff",
+    },
+    "sidebar_hide_name": False,
+    "navigation_with_keys": True,
+    "top_of_page_button": "edit",
+}
+
+# Add GitHub links
+html_context = {
+    "display_github": True,
+    "github_user": "geosensing",
+    "github_repo": "geo_sampling",
+    "github_version": "public",
+    "conf_py_path": "/docs/",
+}
+
+htmlhelp_basename = "Geosamplingdoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -55,28 +116,28 @@ latex_elements = {
 
 latex_documents = [
     (
-        MASTER_DOC,
+        master_doc,
         "Geosampling.tex",
         "Geo sampling Documentation",
-        COPYRIGHT_INFO,
+        copyright,
         "manual",
     ),
 ]
 
 # -- Options for manual page output ---------------------------------------
 
-man_pages = [(MASTER_DOC, "geosampling", "Geo sampling Documentation", [AUTHOR], 1)]
+man_pages = [(master_doc, "geosampling", "Geo sampling Documentation", [author], 1)]
 
 # -- Options for Texinfo output -------------------------------------------
 
 texinfo_documents = [
     (
-        MASTER_DOC,
+        master_doc,
         "Geosampling",
         "Geo sampling Documentation",
-        AUTHOR,
+        author,
         "Geosampling",
-        "One line description of project.",
+        "Geographic road sampling for data collection",
         "Miscellaneous",
     ),
 ]

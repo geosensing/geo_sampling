@@ -1,0 +1,51 @@
+/* Custom CSS for Geo Sampling documentation */
+
+/* Improve code blocks */
+.highlight pre {
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+/* Better spacing for cards */
+.sd-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.sd-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Improve sidebar navigation */
+.sidebar-tree .caption {
+    font-weight: bold;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Better admonition styles */
+.admonition {
+    border-radius: 0.5rem;
+}
+
+/* Improve table styles */
+table.docutils {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table.docutils td, table.docutils th {
+    padding: 0.5rem;
+}
+
+/* Better inline code */
+code.literal {
+    background-color: var(--color-inline-code-background);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+}
+
+/* Responsive images */
+img {
+    max-width: 100%;
+    height: auto;
+}

@@ -61,31 +61,52 @@ This will automatically run linting, formatting, and type checking before each c
 uv run pre-commit run --all-files
 ```
 
-## Usage
+## Quick Start
 
-The package provides two main CLI commands:
+### Command Line Interface
 
-### geo_roads
-Process geographic regions to extract road segments:
+Complete workflow in one command:
 
 ```bash
-geo_roads -c Singapore -n North -l 1
+# Install the package
+pip install geo-sampling
+
+# Sample 100 road segments from Singapore
+geo-sampling workflow "Singapore" "Central" \
+    --sample-size 100 \
+    --output singapore_sample.csv \
+    --plot
 ```
 
-### sample_roads
-Sample from processed road segments:
+### Python API
 
-```bash
-sample_roads input_roads.csv output_sample.csv --sample-size 100
+```python
+import geo_sampling as gs
+
+# Quick sampling for research
+sample = gs.sample_roads_for_region(
+    "Singapore", "Central", 
+    n=100, 
+    strategy="random"
+)
+
+# Plot and save
+gs.quick_plot(sample, title="Singapore Sample")
+sampler = gs.RoadSampler(sample)
+sampler.save_csv(sample, "singapore_sample.csv")
 ```
 
 ## Documentation
 
-* [Installation Guide](docs/install.rst)
-* [Usage Examples](docs/usage.rst)
-* [Sample Workflow](docs/workflow.rst)
+📖 **[Complete Documentation](https://geosensing.github.io/geo_sampling/)** - Comprehensive guides and examples
 
-For complete documentation, visit the [project documentation page](https://geosensing.github.io/geo_sampling/).
+🚀 **[Quick Start Guide](https://geosensing.github.io/geo_sampling/quickstart.html)** - Get up and running in 5 minutes
+
+🐍 **[Python API Examples](https://geosensing.github.io/geo_sampling/examples/python-api.html)** - Complete code examples with real data
+
+💻 **[CLI Usage Guide](https://geosensing.github.io/geo_sampling/examples/cli-usage.html)** - Command-line interface examples
+
+📁 **[Example Outputs](examples/outputs/)** - Download real sample data and plots
 
 ## 🔗 Adjacent Repositories
 
