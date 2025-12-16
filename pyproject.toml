@@ -48,12 +48,12 @@ test = ["coverage", "pytest"]
 docs = ["sphinx>=4.0", "furo"]
 
 [project.urls]
-Homepage = "https://github.com/geosensing/geo_sampling"
-Repository = "https://github.com/geosensing/geo_sampling"
-Documentation = "https://geosensing.github.io/geo_sampling/"
-Changelog = "https://github.com/geosensing/geo_sampling/blob/public/CHANGELOG.md"
-Issues = "https://github.com/geosensing/geo_sampling/issues"
-Discussions = "https://github.com/geosensing/geo_sampling/discussions"
+Homepage = "https://github.com/geosensing/geo-sampling"
+Repository = "https://github.com/geosensing/geo-sampling"
+Documentation = "https://geosensing.github.io/geo-sampling/"
+Changelog = "https://github.com/geosensing/geo-sampling/blob/public/CHANGELOG.md"
+Issues = "https://github.com/geosensing/geo-sampling/issues"
+Discussions = "https://github.com/geosensing/geo-sampling/discussions"
 
 [project.scripts]
 geo-sampling = "geo_sampling.cli:cli"

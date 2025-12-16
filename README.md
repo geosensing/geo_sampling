@@ -1,6 +1,6 @@
 # Geo sampling: Randomly sample locations on streets
 
-[![CI](https://github.com/geosensing/geo_sampling/actions/workflows/ci.yml/badge.svg)](https://github.com/geosensing/geo_sampling/actions/workflows/ci.yml)
+[![CI](https://github.com/geosensing/geo-sampling/actions/workflows/ci.yml/badge.svg)](https://github.com/geosensing/geo-sampling/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/geo_sampling.svg?maxAge=3600)](https://pypi.python.org/pypi/geo_sampling)
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://geosensing.github.io/geo-sampling/)
 [![Downloads](https://pepy.tech/badge/geo-sampling)](https://pepy.tech/project/geo-sampling)
@@ -42,8 +42,8 @@ pip install geo-sampling
 For development, install with development dependencies:
 
 ```bash
-git clone https://github.com/geosensing/geo_sampling.git
-cd geo_sampling
+git clone https://github.com/geosensing/geo-sampling.git
+cd geo-sampling
 uv sync --group dev
 ```
 
@@ -98,13 +98,13 @@ sampler.save_csv(sample, "singapore_sample.csv")
 
 ## Documentation
 
-📖 **[Complete Documentation](https://geosensing.github.io/geo_sampling/)** - Comprehensive guides and examples
+📖 **[Complete Documentation](https://geosensing.github.io/geo-sampling/)** - Comprehensive guides and examples
 
-🚀 **[Quick Start Guide](https://geosensing.github.io/geo_sampling/quickstart.html)** - Get up and running in 5 minutes
+🚀 **[Quick Start Guide](https://geosensing.github.io/geo-sampling/quickstart.html)** - Get up and running in 5 minutes
 
-🐍 **[Python API Examples](https://geosensing.github.io/geo_sampling/examples/python-api.html)** - Complete code examples with real data
+🐍 **[Python API Examples](https://geosensing.github.io/geo-sampling/examples/python-api.html)** - Complete code examples with real data
 
-💻 **[CLI Usage Guide](https://geosensing.github.io/geo_sampling/examples/cli-usage.html)** - Command-line interface examples
+💻 **[CLI Usage Guide](https://geosensing.github.io/geo-sampling/examples/cli-usage.html)** - Command-line interface examples
 
 📁 **[Example Outputs](examples/outputs/)** - Download real sample data and plots
 
