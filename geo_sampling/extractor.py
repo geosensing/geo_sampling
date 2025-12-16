@@ -177,16 +177,8 @@ class RoadExtractor:
 
         Returns:
             pandas.DataFrame with road segment data
-
-        Raises:
-            ImportError: If pandas is not installed
         """
-        try:
-            import pandas as pd
-        except ImportError:
-            raise ImportError(
-                "pandas is required for DataFrame conversion. Install with: pip install pandas"
-            )
+        import pandas as pd
 
         segments = self.get_roads(road_types, segment_length)
         data = [segment.to_dict() for segment in segments]

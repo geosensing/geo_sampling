@@ -11,7 +11,6 @@ stratified sampling, and various filtering operations.
 import os
 import tempfile
 import unittest
-from unittest.mock import patch
 import matplotlib
 
 matplotlib.use("Agg")  # Use non-interactive backend for testing
@@ -325,27 +324,6 @@ class TestRoadSampler(unittest.TestCase):
         except ImportError:
             # Skip this test if pandas is not available
             self.skipTest("pandas not available for testing")
-
-    def test_dataframe_conversion_no_pandas(self):
-        """Test DataFrame conversion when pandas is not available."""
-        # This test verifies the error handling when pandas is missing
-        sample = self.sampler.random_sample(5, seed=42)
-
-        # Mock the import to raise ImportError
-        import builtins
-
-        real_import = builtins.__import__
-
-        def mock_import(name, *args, **kwargs):
-            if name == "pandas":
-                raise ImportError("No module named 'pandas'")
-            return real_import(name, *args, **kwargs)
-
-        with patch("builtins.__import__", side_effect=mock_import):
-            with self.assertRaises(ImportError) as context:
-                self.sampler.to_dataframe(sample)
-
-            self.assertIn("pandas is required", str(context.exception))
 
 
 class TestSamplingUtilityFunctions(unittest.TestCase):

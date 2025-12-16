@@ -20,7 +20,7 @@ For more examples, see the documentation at:
 https://geosensing.github.io/geo_sampling/
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __author__ = "Suriyan Laohaprapanon, Gaurav Sood"
 __email__ = "gsood07@gmail.com"
 

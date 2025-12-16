@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-01-17
+
+### Changed
+- **Simplified pandas integration**: Pandas is now a direct dependency (no more ImportError handling)
+- **Improved development tooling**: Added comprehensive pytest, mypy, and git configuration
+- **Enhanced project metadata**: Added Python 3.13 support, better classifiers, and project URLs
+- **Cleaner testing**: Removed unnecessary test coverage HTML/XML output, CLI-only reporting
+- **Better gitignore**: Enhanced patterns for modern Python development
+
+### Removed
+- Unnecessary pandas ImportError handling (pandas is now always available)
+- HTML/XML coverage reports (CLI reporting only)
+- Obsolete test for pandas ImportError scenario
+
 ## [0.3.0] - 2024-12-01
 
 ### Added

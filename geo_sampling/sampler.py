@@ -247,16 +247,8 @@ class RoadSampler:
 
         Returns:
             pandas.DataFrame with segment data
-
-        Raises:
-            ImportError: If pandas is not installed
         """
-        try:
-            import pandas as pd
-        except ImportError:
-            raise ImportError(
-                "pandas is required for DataFrame conversion. Install with: pip install pandas"
-            )
+        import pandas as pd
 
         data = [segment.to_dict() for segment in segments]
         return pd.DataFrame(data)

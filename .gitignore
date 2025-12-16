@@ -9,6 +9,11 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Virtual environments
+.venv/
+venv/
+env/
+
 # Build artifacts
 build/
 dist/
@@ -19,9 +24,30 @@ docs/_build/
 
 # Test artifacts
 .pytest_cache/
+.coverage
 output*.csv
 *.log
 
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data directories
+data/
+*.csv
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
 
 # OS files
 .DS_Store
+Thumbs.db
