@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/geosensing/geo_sampling/actions/workflows/ci.yml/badge.svg)](https://github.com/geosensing/geo_sampling/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/geo_sampling.svg?maxAge=3600)](https://pypi.python.org/pypi/geo_sampling)
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://geosensing.github.io/geo_sampling/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://geosensing.github.io/geo-sampling/)
 [![Downloads](https://pepy.tech/badge/geo-sampling)](https://pepy.tech/project/geo-sampling)
 
 Say you want to learn about the average number of potholes per kilometer of street in a city. Or estimate a similar such quantity. To estimate the quantity, you need to sample locations on the streets. This package helps you sample those locations. In particular, the package implements the following sampling strategy:
