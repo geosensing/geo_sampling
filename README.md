@@ -113,8 +113,8 @@ sampler.save_csv(sample, "singapore_sample.csv")
 - [geosensing/latlong-to-zip](https://github.com/geosensing/latlong-to-zip) — Reverse Geocode Lat/Long to Zip Codes using GeoNames, AskGeo, or Google. Compare Geocoding Services.
 - [geosensing/autosense](https://github.com/geosensing/autosense) — AutoSense: Automated Street Condition Assessment
 - [geosensing/streetsense](https://github.com/geosensing/streetsense) — Street Sense: Learning from Google Street View
-- [geosensing/missing_women](https://github.com/geosensing/missing_women) — Missing Women On the Streets: Evidence from Mumbai
 - [geosensing/women-count](https://github.com/geosensing/women-count) — Missing Women on the streets of Delhi
+- [geosensing/missing_women](https://github.com/geosensing/missing_women) — Missing Women On the Streets: Evidence from Mumbai
 ## Authors
 
 Suriyan Laohaprapanon and Gaurav Sood
