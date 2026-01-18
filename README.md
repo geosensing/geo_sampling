@@ -114,7 +114,7 @@ sampler.save_csv(sample, "singapore_sample.csv")
 - [geosensing/autosense](https://github.com/geosensing/autosense) — AutoSense: Automated Street Condition Assessment
 - [geosensing/streetsense](https://github.com/geosensing/streetsense) — Street Sense: Learning from Google Street View
 - [geosensing/women-count](https://github.com/geosensing/women-count) — Missing Women on the streets of Delhi
-- [geosensing/missing_women](https://github.com/geosensing/missing_women) — Missing Women On the Streets: Evidence from Mumbai
+- [geosensing/ybar](https://github.com/geosensing/ybar) — Web application for mobile phones to crowdsource data collection from geographically distributed locations
 ## Authors
 
 Suriyan Laohaprapanon and Gaurav Sood
